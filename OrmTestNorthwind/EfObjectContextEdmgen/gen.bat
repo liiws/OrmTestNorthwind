@@ -1,0 +1,1 @@
+EdmGen.exe /mode:fullgeneration /c:"Data Source=127.0.0.1;Initial Catalog=Northwind;Integrated Security=True" /provider:System.Data.SqlClient /entitycontainer:EfObjectContextEdmgenEntities /project:OrmTestNorthwind /namespace:"OrmTestNorthwind.EfObjectContextEdmgen" /language:CSharp /pluralize
