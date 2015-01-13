@@ -3,3 +3,7 @@ syntax: glob
 packages/EntityFramework*
 packages/BLToolkit*
 OrmTestNorthwind/EfObjectContextEdmgen/EdmGen.exe
+EfDbContextDesigner/bin
+EfDbContextDesigner/obj
+OrmTestNorthwind/bin
+OrmTestNorthwind/obj
