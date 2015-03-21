@@ -32,120 +32,91 @@ namespace OrmTestNorthwind
 
 			// SIMPLE QUERY
 
-			
-			var simpleEfDbContextCodeFirstTop10 = Test(
-				() =>
+			Func<int> simpleEfDbContextCodeFirstTop10 = () =>
+			{
+				using (var ctx = new NorthwindEfDbContextCodeFirst())
 				{
-					using (var ctx = new NorthwindEfDbContextCodeFirst())
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join c in ctx.Customers on o.CustomerID equals c.CustomerID
-								select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
-							).Take(10).ToList();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple, EfDbContextCodeFirst, take 10 (n = {0}) = {1} ms", hot, simpleEfDbContextCodeFirstTop10);
+					var list =
+						(
+							from o in ctx.Orders
+							join c in ctx.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					return list.Count;
+				}
+			};
 
-			var simpleEfDbContextCodeFirstTop500 = Test(
-				() =>
+			Func<int> simpleEfDbContextCodeFirstTop500 = () =>
+			{
+				using (var ctx = new NorthwindEfDbContextCodeFirst())
 				{
-					using (var ctx = new NorthwindEfDbContextCodeFirst())
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join c in ctx.Customers on o.CustomerID equals c.CustomerID
-								select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+					var list =
+						(
+							from o in ctx.Orders
+							join c in ctx.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
 							).Take(500).ToList();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple, EfDbContextCodeFirst, take 500 (n = {0}) = {1} ms", hot, simpleEfDbContextCodeFirstTop500);
+					return list.Count;
+				}
+			};
 
-
-			
-			var simpleEfDbContextDesignerTop10 = Test(
-				() =>
+			Func<int> simpleEfDbContextDesignerTop10 = () =>
+			{
+				using (var ctx = new NorthwindEfDbContextDesignerEntities())
 				{
-					using (var ctx = new NorthwindEfDbContextDesignerEntities())
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join c in ctx.Customers on o.CustomerID equals c.CustomerID
-								select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
-							).Take(10).ToList();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple, EfDbContextDesigner, take 10 (n = {0}) = {1} ms", hot, simpleEfDbContextDesignerTop10);
+					var list =
+						(
+							from o in ctx.Orders
+							join c in ctx.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					return list.Count;
+				}
+			};
 
-			var simpleEfDbContextDesignerTop500 = Test(
-				() =>
+			Func<int> simpleEfDbContextDesignerTop500 = () =>
+			{
+				using (var ctx = new NorthwindEfDbContextDesignerEntities())
 				{
-					using (var ctx = new NorthwindEfDbContextDesignerEntities())
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join c in ctx.Customers on o.CustomerID equals c.CustomerID
-								select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
-							).Take(500).ToList();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple, EfDbContextDesigner, take 500 (n = {0}) = {1} ms", hot, simpleEfDbContextDesignerTop500);
+					var list =
+						(
+							from o in ctx.Orders
+							join c in ctx.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(500).ToList();
+					return list.Count;
+				}
+			};
 
-
-
-			var simpleEfObjectContextEdmgenTop10 = Test(
-				() =>
+			Func<int> simpleEfObjectContextEdmgenTop10 = () =>
+			{
+				using (var ctx = new EfObjectContextEdmgenEntities(connectionStringObjectContext))
 				{
-					using (var ctx = new EfObjectContextEdmgenEntities(connectionStringObjectContext))
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join c in ctx.Customers on o.CustomerID equals c.CustomerID
-								select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
-							).Take(10).ToList();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple, EfObjectContextEdmgen, take 10 (n = {0}) = {1} ms", hot, simpleEfObjectContextEdmgenTop10);
-			
-			var simpleEfObjectContextEdmgenTop500 = Test(
-				() =>
+					var list =
+						(
+							from o in ctx.Orders
+							join c in ctx.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					return list.Count;
+				}
+			};
+
+			Func<int> simpleEfObjectContextEdmgenTop500 = () =>
+			{
+				using (var ctx = new EfObjectContextEdmgenEntities(connectionStringObjectContext))
 				{
-					using (var ctx = new EfObjectContextEdmgenEntities(connectionStringObjectContext))
-					{
-						ctx.Orders.MergeOption = System.Data.Objects.MergeOption.NoTracking;
-						ctx.Customers.MergeOption = System.Data.Objects.MergeOption.NoTracking;
-						var list =
-							(
-								from o in ctx.Orders
-								join c in ctx.Customers on o.CustomerID equals c.CustomerID
-								select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
-							).Take(500).ToList();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple, EfObjectContextEdmgen, take 500 (n = {0}) = {1} ms", hot, simpleEfObjectContextEdmgenTop500);
+					//ctx.Orders.MergeOption = System.Data.Objects.MergeOption.NoTracking;
+					//ctx.Customers.MergeOption = System.Data.Objects.MergeOption.NoTracking;
+					var list =
+						(
+							from o in ctx.Orders
+							join c in ctx.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(500).ToList();
+					return list.Count;
+				}
+			};
 
 			Func<EfObjectContextEdmgenEntities, IEnumerable<SimpleQueryRow>> querySimpleEfObjectContextEdmgenTop10Compiled =
 				System.Data.Objects.CompiledQuery.Compile<EfObjectContextEdmgenEntities, IEnumerable<SimpleQueryRow>>
@@ -163,17 +134,13 @@ namespace OrmTestNorthwind
 								CompanyName = r.CompanyName,
 							})
 					);
-			var simpleEfObjectContextEdmgenTop10Compiled = Test(
-				() =>
+			Func<int> simpleEfObjectContextEdmgenTop10Compiled = () =>
+			{
+				using (var ctx = new EfObjectContextEdmgenEntities(connectionStringObjectContext))
 				{
-					using (var ctx = new EfObjectContextEdmgenEntities(connectionStringObjectContext))
-					{
-						return querySimpleEfObjectContextEdmgenTop10Compiled(ctx).Count();
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple compiled, EfObjectContextEdmgen, take 10 (n = {0}) = {1} ms", hot, simpleEfObjectContextEdmgenTop10Compiled);
+					return querySimpleEfObjectContextEdmgenTop10Compiled(ctx).Count();
+				}
+			};
 
 			Func<EfObjectContextEdmgenEntities, IEnumerable<SimpleQueryRow>> querySimpleEfObjectContextEdmgenTop500Compiled =
 				System.Data.Objects.CompiledQuery.Compile<EfObjectContextEdmgenEntities, IEnumerable<SimpleQueryRow>>
@@ -182,7 +149,7 @@ namespace OrmTestNorthwind
 								from o in ctx.Orders
 								join c in ctx.Customers on o.CustomerID equals c.CustomerID
 								select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
-							).Take(500)
+							).Take(10)
 							.Select(r => new SimpleQueryRow
 							{
 								OrderId = r.OrderID,
@@ -191,389 +158,317 @@ namespace OrmTestNorthwind
 								CompanyName = r.CompanyName,
 							})
 					);
-			var simpleEfObjectContextEdmgenTop500Compiled = Test(
-				() =>
+			Func<int> simpleEfObjectContextEdmgenTop500Compiled = () =>
+			{
+				using (var ctx = new EfObjectContextEdmgenEntities(connectionStringObjectContext))
 				{
-					using (var ctx = new EfObjectContextEdmgenEntities(connectionStringObjectContext))
-					{
-						return querySimpleEfObjectContextEdmgenTop500Compiled(ctx).Count();
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple compiled, EfObjectContextEdmgen, take 500 (n = {0}) = {1} ms", hot, simpleEfObjectContextEdmgenTop500Compiled);
+					return querySimpleEfObjectContextEdmgenTop500Compiled(ctx).Count();
+				}
+			};
 
-
-
-			var simpleLinq2SqlTop10 = Test(
-				() =>
+			Func<int> simpleLinq2SqlTop10 = () =>
+			{
+				using (var ctx = new Linq2SqlDataContext(connectionStringNorthwind))
 				{
-					using (var ctx = new Linq2SqlDataContext(connectionStringNorthwind))
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join c in ctx.Customers on o.CustomerID equals c.CustomerID
-								select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
-							).Take(10).ToList();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple, Linq2Sql, take 10 (n = {0}) = {1} ms", hot, simpleLinq2SqlTop10);
+					var list =
+						(
+							from o in ctx.Orders
+							join c in ctx.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					return list.Count;
+				}
+			};
 
-			var simpleLinq2SqlTop500 = Test(
-				() =>
+			Func<int> simpleLinq2SqlTop500 = () =>
+			{
+				using (var ctx = new Linq2SqlDataContext(connectionStringNorthwind))
 				{
-					using (var ctx = new Linq2SqlDataContext(connectionStringNorthwind))
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join c in ctx.Customers on o.CustomerID equals c.CustomerID
-								select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
-							).Take(500).ToList();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple, Linq2Sql, take 500 (n = {0}) = {1} ms", hot, simpleLinq2SqlTop500);
+					var list =
+						(
+							from o in ctx.Orders
+							join c in ctx.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(500).ToList();
+					return list.Count;
+				}
+			};
 
-
-
-			var simpleAdoNetTop10 = Test(
-				() =>
+			Func<int> simpleAdoNetTop10 = () =>
+			{
+				int count = 0;
+				using (var con = new SqlConnection(connectionStringNorthwind))
 				{
-					int count = 0;
-					using (var con = new SqlConnection(connectionStringNorthwind))
-					{
-						con.Open();
-						var sql = @"
+					con.Open();
+					var sql = @"
 SELECT TOP 10 O.OrderID, O.OrderDate, C.Country, C.CompanyName
 FROM Orders O
 JOIN Customers C ON O.CustomerID = C.CustomerID
 							";
-						using (var cmd = new SqlCommand(sql, con))
+					using (var cmd = new SqlCommand(sql, con))
+					{
+						using (var reader = cmd.ExecuteReader())
 						{
-							using (var reader = cmd.ExecuteReader())
+							if (reader.HasRows)
 							{
-								if (reader.HasRows)
+								var list = new List<SimpleQueryRow>();
+								while (reader.Read())
 								{
-									var list = new List<SimpleQueryRow>();
-									while (reader.Read())
+									list.Add(new SimpleQueryRow
 									{
-										list.Add(new SimpleQueryRow
-										{
-											OrderId = reader.GetInt32(0),
-											OrderDate = reader.IsDBNull(1) ? null : (DateTime?)reader.GetDateTime(1),
-											Country = reader.IsDBNull(2) ? null : reader.GetString(2),
-											CompanyName = reader.IsDBNull(3) ? null : reader.GetString(3),
-										});
-									}
-									count = list.Count;
+										OrderId = reader.GetInt32(0),
+										OrderDate = reader.IsDBNull(1) ? null : (DateTime?)reader.GetDateTime(1),
+										Country = reader.IsDBNull(2) ? null : reader.GetString(2),
+										CompanyName = reader.IsDBNull(3) ? null : reader.GetString(3),
+									});
 								}
+								count = list.Count;
 							}
 						}
 					}
-					return count;
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple, ADO.NET, take 10 (n = {0}) = {1} ms", hot, simpleAdoNetTop10);
+				}
+				return count;
+			};
 
-			var simpleAdoNetTop500 = Test(
-				() =>
+			Func<int> simpleAdoNetTop500 = () =>
+			{
+				int count = 0;
+				using (var con = new SqlConnection(connectionStringNorthwind))
 				{
-					int count = 0;
-					using (var con = new SqlConnection(connectionStringNorthwind))
-					{
-						con.Open();
-						var sql = @"
+					con.Open();
+					var sql = @"
 SELECT TOP 500 O.OrderID, O.OrderDate, C.Country, C.CompanyName
 FROM Orders O
 JOIN Customers C ON O.CustomerID = C.CustomerID
 							";
-						using (var cmd = new SqlCommand(sql, con))
+					using (var cmd = new SqlCommand(sql, con))
+					{
+						using (var reader = cmd.ExecuteReader())
 						{
-							using (var reader = cmd.ExecuteReader())
+							if (reader.HasRows)
 							{
-								if (reader.HasRows)
+								var list = new List<SimpleQueryRow>();
+								while (reader.Read())
 								{
-									var list = new List<SimpleQueryRow>();
-									while (reader.Read())
+									list.Add(new SimpleQueryRow
 									{
-										list.Add(new SimpleQueryRow
-										{
-											OrderId = reader.GetInt32(0),
-											OrderDate = reader.IsDBNull(1) ? null : (DateTime?)reader.GetDateTime(1),
-											Country = reader.IsDBNull(2) ? null : reader.GetString(2),
-											CompanyName = reader.IsDBNull(3) ? null : reader.GetString(3),
-										});
-									}
-									count = list.Count;
+										OrderId = reader.GetInt32(0),
+										OrderDate = reader.IsDBNull(1) ? null : (DateTime?)reader.GetDateTime(1),
+										Country = reader.IsDBNull(2) ? null : reader.GetString(2),
+										CompanyName = reader.IsDBNull(3) ? null : reader.GetString(3),
+									});
 								}
+								count = list.Count;
 							}
 						}
 					}
-					return count;
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple, ADO.NET, take 500 (n = {0}) = {1} ms", hot, simpleAdoNetTop500);
+				}
+				return count;
+			};
 
-
-
-			var simpleBltTop10 = Test(
-				() =>
+			Func<int> simpleBltTop10 = () =>
+			{
+				using (var db = new DbManager())
 				{
-					using (var db = new DbManager())
-					{
-						var sql = @"
+					var sql = @"
 SELECT TOP 10 O.OrderID, O.OrderDate, C.Country, C.CompanyName
 FROM Orders O
 JOIN Customers C ON O.CustomerID = C.CustomerID
 							";
-						var list = db.SetCommand(sql).ExecuteList<SimpleQueryRow>();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple, BLToolkit, take 10 (n = {0}) = {1} ms", hot, simpleBltTop10);
+					var list = db.SetCommand(sql).ExecuteList<SimpleQueryRow>();
+					return list.Count;
+				}
+			};
 
-			var simpleBltTop500 = Test(
-				() =>
+			Func<int> simpleBltTop500 = () =>
+			{
+				using (var db = new DbManager())
 				{
-					using (var db = new DbManager())
-					{
-						var sql = @"
+					var sql = @"
 SELECT TOP 500 O.OrderID, O.OrderDate, C.Country, C.CompanyName
 FROM Orders O
 JOIN Customers C ON O.CustomerID = C.CustomerID
 							";
-						var list = db.SetCommand(sql).ExecuteList<SimpleQueryRow>();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple, BLToolkit, take 500 (n = {0}) = {1} ms", hot, simpleBltTop500);
+					var list = db.SetCommand(sql).ExecuteList<SimpleQueryRow>();
+					return list.Count;
+				}
+			};
+
+
 
 
 
 			// COMPLEX QUERY
 
 
-			var complexEfDbContextCodeFirstTop10 = Test(
-				() =>
+
+			Func<int> complexEfDbContextCodeFirstTop10 = () =>
+			{
+				using (var ctx = new NorthwindEfDbContextCodeFirst())
 				{
-					using (var ctx = new NorthwindEfDbContextCodeFirst())
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join od in ctx.Order_Details on o.OrderID equals od.OrderID
-								join p in ctx.Products on od.ProductID equals p.ProductID
-								join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
-								join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
-								where categoryIds.Contains(cat.CategoryID)
-									&& supplierIds.Contains(s.SupplierID)
-								orderby od.Discount descending
-								select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
-							).Take(10).ToList();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("complex, EfDbContextCodeFirst, take 10 (n = {0}) = {1} ms", hot, complexEfDbContextCodeFirstTop10);
+					var list =
+						(
+							from o in ctx.Orders
+							join od in ctx.Order_Details on o.OrderID equals od.OrderID
+							join p in ctx.Products on od.ProductID equals p.ProductID
+							join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
+							join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
+							where categoryIds.Contains(cat.CategoryID)
+								&& supplierIds.Contains(s.SupplierID)
+							orderby od.Discount descending
+							select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
+						).Take(10).ToList();
+					return list.Count;
+				}
+			};
 
-			var complexEfDbContextCodeFirstTop500 = Test(
-				() =>
+			Func<int> complexEfDbContextCodeFirstTop500 = () =>
+			{
+				using (var ctx = new NorthwindEfDbContextCodeFirst())
 				{
-					using (var ctx = new NorthwindEfDbContextCodeFirst())
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join od in ctx.Order_Details on o.OrderID equals od.OrderID
-								join p in ctx.Products on od.ProductID equals p.ProductID
-								join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
-								join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
-								where categoryIds.Contains(cat.CategoryID)
-									&& supplierIds.Contains(s.SupplierID)
-								orderby od.Discount descending
-								select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
-							).Take(500).ToList();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("complex, EfDbContextCodeFirst, take 500 (n = {0}) = {1} ms", hot, complexEfDbContextCodeFirstTop500);
+					var list =
+						(
+							from o in ctx.Orders
+							join od in ctx.Order_Details on o.OrderID equals od.OrderID
+							join p in ctx.Products on od.ProductID equals p.ProductID
+							join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
+							join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
+							where categoryIds.Contains(cat.CategoryID)
+								&& supplierIds.Contains(s.SupplierID)
+							orderby od.Discount descending
+							select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
+						).Take(500).ToList();
+					return list.Count;
+				}
+			};
 
-
-
-			var complexEfDbContextDesignerTop10 = Test(
-				() =>
+			Func<int> complexEfDbContextDesignerTop10 = () =>
+			{
+				using (var ctx = new NorthwindEfDbContextDesignerEntities())
 				{
-					using (var ctx = new NorthwindEfDbContextDesignerEntities())
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join od in ctx.Order_Details on o.OrderID equals od.OrderID
-								join p in ctx.Products on od.ProductID equals p.ProductID
-								join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
-								join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
-								where categoryIds.Contains(cat.CategoryID)
-									&& supplierIds.Contains(s.SupplierID)
-								orderby od.Discount descending
-								select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
-							).Take(10).ToList();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("complex, EfDbContextDesigner, take 10 (n = {0}) = {1} ms", hot, complexEfDbContextDesignerTop10);
+					var list =
+						(
+							from o in ctx.Orders
+							join od in ctx.Order_Details on o.OrderID equals od.OrderID
+							join p in ctx.Products on od.ProductID equals p.ProductID
+							join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
+							join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
+							where categoryIds.Contains(cat.CategoryID)
+								&& supplierIds.Contains(s.SupplierID)
+							orderby od.Discount descending
+							select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
+						).Take(10).ToList();
+					return list.Count;
+				}
+			};
 
-			var complexEfDbContextDesignerTop500 = Test(
-				() =>
+			Func<int> complexEfDbContextDesignerTop500 = () =>
+			{
+				using (var ctx = new NorthwindEfDbContextDesignerEntities())
 				{
-					using (var ctx = new NorthwindEfDbContextDesignerEntities())
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join od in ctx.Order_Details on o.OrderID equals od.OrderID
-								join p in ctx.Products on od.ProductID equals p.ProductID
-								join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
-								join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
-								where categoryIds.Contains(cat.CategoryID)
-									&& supplierIds.Contains(s.SupplierID)
-								orderby od.Discount descending
-								select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
-							).Take(500).ToList();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("complex, EfDbContextDesigner, take 500 (n = {0}) = {1} ms", hot, complexEfDbContextDesignerTop500);
+					var list =
+						(
+							from o in ctx.Orders
+							join od in ctx.Order_Details on o.OrderID equals od.OrderID
+							join p in ctx.Products on od.ProductID equals p.ProductID
+							join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
+							join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
+							where categoryIds.Contains(cat.CategoryID)
+								&& supplierIds.Contains(s.SupplierID)
+							orderby od.Discount descending
+							select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
+						).Take(500).ToList();
+					return list.Count;
+				}
+			};
 
-
-
-			var complexEfObjectContextEdmgenTop10 = Test(
-				() =>
+			Func<int> complexEfObjectContextEdmgenTop10 = () =>
+			{
+				using (var ctx = new EfObjectContextEdmgenEntities(connectionStringObjectContext))
 				{
-					using (var ctx = new EfObjectContextEdmgenEntities(connectionStringObjectContext))
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join od in ctx.Order_Details on o.OrderID equals od.OrderID
-								join p in ctx.Products on od.ProductID equals p.ProductID
-								join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
-								join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
-								where categoryIds.Contains(cat.CategoryID)
-									&& supplierIds.Contains(s.SupplierID)
-								orderby od.Discount descending
-								select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
-							).Take(10).ToList();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("complex, EfObjectContextEdmgen, take 10 (n = {0}) = {1} ms", hot, complexEfObjectContextEdmgenTop10);
-			
-			var complexEfObjectContextEdmgenTop500 = Test(
-				() =>
+					var list =
+						(
+							from o in ctx.Orders
+							join od in ctx.Order_Details on o.OrderID equals od.OrderID
+							join p in ctx.Products on od.ProductID equals p.ProductID
+							join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
+							join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
+							where categoryIds.Contains(cat.CategoryID)
+								&& supplierIds.Contains(s.SupplierID)
+							orderby od.Discount descending
+							select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
+						).Take(10).ToList();
+					return list.Count;
+				}
+			};
+
+			Func<int> complexEfObjectContextEdmgenTop500 = () =>
+			{
+				using (var ctx = new EfObjectContextEdmgenEntities(connectionStringObjectContext))
 				{
-					using (var ctx = new EfObjectContextEdmgenEntities(connectionStringObjectContext))
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join od in ctx.Order_Details on o.OrderID equals od.OrderID
-								join p in ctx.Products on od.ProductID equals p.ProductID
-								join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
-								join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
-								where categoryIds.Contains(cat.CategoryID)
-									&& supplierIds.Contains(s.SupplierID)
-								orderby od.Discount descending
-								select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
-							).Take(500).ToList();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("complex, EfObjectContextEdmgen, take 500 (n = {0}) = {1} ms", hot, complexEfObjectContextEdmgenTop500);
+					var list =
+						(
+							from o in ctx.Orders
+							join od in ctx.Order_Details on o.OrderID equals od.OrderID
+							join p in ctx.Products on od.ProductID equals p.ProductID
+							join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
+							join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
+							where categoryIds.Contains(cat.CategoryID)
+								&& supplierIds.Contains(s.SupplierID)
+							orderby od.Discount descending
+							select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
+						).Take(500).ToList();
+					return list.Count;
+				}
+			};
 
-
-
-			var complexLinq2SqlTop10 = Test(
-				() =>
+			Func<int> complexLinq2SqlTop10 = () =>
+			{
+				using (var ctx = new Linq2SqlDataContext(connectionStringNorthwind))
 				{
-					using (var ctx = new Linq2SqlDataContext(connectionStringNorthwind))
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join od in ctx.Order_Details on o.OrderID equals od.OrderID
-								join p in ctx.Products on od.ProductID equals p.ProductID
-								join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
-								join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
-								where categoryIds.Contains(cat.CategoryID)
-									&& supplierIds.Contains(s.SupplierID)
-								orderby od.Discount descending
-								select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
-							).Take(10).ToList();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("complex, Linq2Sql, take 10 (n = {0}) = {1} ms", hot, complexLinq2SqlTop10);
+					var list =
+						(
+							from o in ctx.Orders
+							join od in ctx.Order_Details on o.OrderID equals od.OrderID
+							join p in ctx.Products on od.ProductID equals p.ProductID
+							join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
+							join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
+							where categoryIds.Contains(cat.CategoryID)
+								&& supplierIds.Contains(s.SupplierID)
+							orderby od.Discount descending
+							select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
+						).Take(10).ToList();
+					return list.Count;
+				}
+			};
 
-			var complexLinq2SqlTop500 = Test(
-				() =>
+			Func<int> complexLinq2SqlTop500 = () =>
+			{
+				using (var ctx = new Linq2SqlDataContext(connectionStringNorthwind))
 				{
-					using (var ctx = new Linq2SqlDataContext(connectionStringNorthwind))
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join od in ctx.Order_Details on o.OrderID equals od.OrderID
-								join p in ctx.Products on od.ProductID equals p.ProductID
-								join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
-								join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
-								where categoryIds.Contains(cat.CategoryID)
-									&& supplierIds.Contains(s.SupplierID)
-								orderby od.Discount descending
-								select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
-							).Take(500).ToList();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("complex, Linq2Sql, take 500 (n = {0}) = {1} ms", hot, complexLinq2SqlTop500);
+					var list =
+						(
+							from o in ctx.Orders
+							join od in ctx.Order_Details on o.OrderID equals od.OrderID
+							join p in ctx.Products on od.ProductID equals p.ProductID
+							join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
+							join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
+							where categoryIds.Contains(cat.CategoryID)
+								&& supplierIds.Contains(s.SupplierID)
+							orderby od.Discount descending
+							select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
+						).Take(500).ToList();
+					return list.Count;
+				}
+			};
 
-
-
-			var complexAdoNetTop10 = Test(
-				() =>
+			Func<int> complexAdoNetTop10 = () =>
+			{
+				int count = 0;
+				using (var con = new SqlConnection(connectionStringNorthwind))
 				{
-					int count = 0;
-					using (var con = new SqlConnection(connectionStringNorthwind))
-					{
-						con.Open();
-						var sql = @"
+					con.Open();
+					var sql = @"
 SELECT TOP 10 OD.Quantity, OD.UnitPrice, OD.Discount, O.ShipCountry, S.Country
 FROM Orders O
 JOIN [Order Details] OD ON O.OrderID = OD.OrderID
@@ -585,44 +480,40 @@ WHERE
 	AND S.SupplierID IN (@supplierIds)
 ORDER BY OD.Discount DESC
 							".Replace("@categoryIds", string.Join(",", categoryIds))
-							 .Replace("@supplierIds", string.Join(",", supplierIds));
-						using (var cmd = new SqlCommand(sql, con))
+						 .Replace("@supplierIds", string.Join(",", supplierIds));
+					using (var cmd = new SqlCommand(sql, con))
+					{
+						using (var reader = cmd.ExecuteReader())
 						{
-							using (var reader = cmd.ExecuteReader())
+							if (reader.HasRows)
 							{
-								if (reader.HasRows)
+								var list = new List<ComplexQueryRow>();
+								while (reader.Read())
 								{
-									var list = new List<ComplexQueryRow>();
-									while (reader.Read())
+									list.Add(new ComplexQueryRow
 									{
-										list.Add(new ComplexQueryRow
-										{
-											Quantity = reader.GetInt16(0),
-											UnitPrice = reader.GetDecimal(1),
-											Discount = reader.GetFloat(2),
-											ShipCountry = reader.IsDBNull(1) ? null : reader.GetString(3),
-											Country = reader.IsDBNull(1) ? null : reader.GetString(4),
-										});
-									}
-									count = list.Count;
+										Quantity = reader.GetInt16(0),
+										UnitPrice = reader.GetDecimal(1),
+										Discount = reader.GetFloat(2),
+										ShipCountry = reader.IsDBNull(1) ? null : reader.GetString(3),
+										Country = reader.IsDBNull(1) ? null : reader.GetString(4),
+									});
 								}
+								count = list.Count;
 							}
 						}
 					}
-					return count;
-				},
-				cold,
-				hot);
-			Console.WriteLine("complex, ADO.NET, take 10 (n = {0}) = {1} ms", hot, complexAdoNetTop10);
+				}
+				return count;
+			};
 
-			var complexAdoNetTop500 = Test(
-				() =>
+			Func<int> complexAdoNetTop500 = () =>
+			{
+				int count = 0;
+				using (var con = new SqlConnection(connectionStringNorthwind))
 				{
-					int count = 0;
-					using (var con = new SqlConnection(connectionStringNorthwind))
-					{
-						con.Open();
-						var sql = @"
+					con.Open();
+					var sql = @"
 SELECT TOP 500 OD.Quantity, OD.UnitPrice, OD.Discount, O.ShipCountry, S.Country
 FROM Orders O
 JOIN [Order Details] OD ON O.OrderID = OD.OrderID
@@ -634,44 +525,38 @@ WHERE
 	AND S.SupplierID IN (@supplierIds)
 ORDER BY OD.Discount DESC
 							".Replace("@categoryIds", string.Join(",", categoryIds))
-							 .Replace("@supplierIds", string.Join(",", supplierIds));
-						using (var cmd = new SqlCommand(sql, con))
+						 .Replace("@supplierIds", string.Join(",", supplierIds));
+					using (var cmd = new SqlCommand(sql, con))
+					{
+						using (var reader = cmd.ExecuteReader())
 						{
-							using (var reader = cmd.ExecuteReader())
+							if (reader.HasRows)
 							{
-								if (reader.HasRows)
+								var list = new List<ComplexQueryRow>();
+								while (reader.Read())
 								{
-									var list = new List<ComplexQueryRow>();
-									while (reader.Read())
+									list.Add(new ComplexQueryRow
 									{
-										list.Add(new ComplexQueryRow
-										{
-											Quantity = reader.GetInt16(0),
-											UnitPrice = reader.GetDecimal(1),
-											Discount = reader.GetFloat(2),
-											ShipCountry = reader.IsDBNull(1) ? null : reader.GetString(3),
-											Country = reader.IsDBNull(1) ? null : reader.GetString(4),
-										});
-									}
-									count = list.Count;
+										Quantity = reader.GetInt16(0),
+										UnitPrice = reader.GetDecimal(1),
+										Discount = reader.GetFloat(2),
+										ShipCountry = reader.IsDBNull(1) ? null : reader.GetString(3),
+										Country = reader.IsDBNull(1) ? null : reader.GetString(4),
+									});
 								}
+								count = list.Count;
 							}
 						}
 					}
-					return count;
-				},
-				cold,
-				hot);
-			Console.WriteLine("complex, ADO.NET, take 500 (n = {0}) = {1} ms", hot, complexAdoNetTop500);
+				}
+				return count;
+			};
 
-
-
-			var complexBltTop10 = Test(
-				() =>
+			Func<int> complexBltTop10 = () =>
+			{
+				using (var db = new DbManager())
 				{
-					using (var db = new DbManager())
-					{
-						var sql = @"
+					var sql = @"
 SELECT TOP 10 OD.Quantity, OD.UnitPrice, OD.Discount, O.ShipCountry, S.Country
 FROM Orders O
 JOIN [Order Details] OD ON O.OrderID = OD.OrderID
@@ -682,22 +567,18 @@ WHERE
 	Cat.CategoryID IN (@categoryIds)
 	AND S.SupplierID IN (@supplierIds)
 ORDER BY OD.Discount DESC
-							".Replace("@categoryIds", string.Join(",", categoryIds))
-							 .Replace("@supplierIds", string.Join(",", supplierIds));
-						var list = db.SetCommand(sql).ExecuteList<ComplexQueryRow>();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("complex, BLToolkit, take 10 (n = {0}) = {1} ms", hot, complexBltTop10);
+						".Replace("@categoryIds", string.Join(",", categoryIds))
+						 .Replace("@supplierIds", string.Join(",", supplierIds));
+					var list = db.SetCommand(sql).ExecuteList<ComplexQueryRow>();
+					return list.Count;
+				}
+			};
 
-			var complexBltTop500 = Test(
-				() =>
+			Func<int> complexBltTop500 = () =>
+			{
+				using (var db = new DbManager())
 				{
-					using (var db = new DbManager())
-					{
-						var sql = @"
+					var sql = @"
 SELECT TOP 500 OD.Quantity, OD.UnitPrice, OD.Discount, O.ShipCountry, S.Country
 FROM Orders O
 JOIN [Order Details] OD ON O.OrderID = OD.OrderID
@@ -708,209 +589,246 @@ WHERE
 	Cat.CategoryID IN (@categoryIds)
 	AND S.SupplierID IN (@supplierIds)
 ORDER BY OD.Discount DESC
-							".Replace("@categoryIds", string.Join(",", categoryIds))
-							 .Replace("@supplierIds", string.Join(",", supplierIds));
-						var list = db.SetCommand(sql).ExecuteList<ComplexQueryRow>();
-						return list.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("complex, BLToolkit, take 500 (n = {0}) = {1} ms", hot, complexBltTop500);
+						".Replace("@categoryIds", string.Join(",", categoryIds))
+						 .Replace("@supplierIds", string.Join(",", supplierIds));
+					var list = db.SetCommand(sql).ExecuteList<ComplexQueryRow>();
+					return list.Count;
+				}
+			};
+
+
+
 
 
 
 			// SIMPLE 10 + 10 QUERY (TO CALCULATE CONTEXT INITIALIZATION TIME)
 
-			
-			var simpleEfDbContextCodeFirstTop10And10 = Test(
-				() =>
-				{
-					using (var ctx = new NorthwindEfDbContextCodeFirst())
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join c in ctx.Customers on o.CustomerID equals c.CustomerID
-								select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
-							).Take(10).ToList();
-						var list2 =
-							(
-								from o in ctx.Orders
-								join c in ctx.Customers on o.CustomerID equals c.CustomerID
-								select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
-							).Take(10).ToList();
-						return list.Count + list2.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple, EfDbContextCodeFirst, take 10+10 (n = {0}) = {1} ms", hot, simpleEfDbContextCodeFirstTop10And10);
-			
-			var simpleEfDbContextDesignerTop10And10 = Test(
-				() =>
-				{
-					using (var ctx = new NorthwindEfDbContextDesignerEntities())
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join c in ctx.Customers on o.CustomerID equals c.CustomerID
-								select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
-							).Take(10).ToList();
-						var list2 =
-							(
-								from o in ctx.Orders
-								join c in ctx.Customers on o.CustomerID equals c.CustomerID
-								select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
-							).Take(10).ToList();
-						return list.Count + list2.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple, EfDbContextDesigner, take 10+10 (n = {0}) = {1} ms", hot, simpleEfDbContextDesignerTop10And10);
 
-			var simpleEfObjectContextEdmgenTop10And10 = Test(
-				() =>
-				{
-					using (var ctx = new EfObjectContextEdmgenEntities(connectionStringObjectContext))
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join c in ctx.Customers on o.CustomerID equals c.CustomerID
-								select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
-							).Take(10).ToList();
-						var list2 =
-							(
-								from o in ctx.Orders
-								join c in ctx.Customers on o.CustomerID equals c.CustomerID
-								select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
-							).Take(10).ToList();
-						return list.Count + list2.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple, EfObjectContextEdmgen, take 10+10 (n = {0}) = {1} ms", hot, simpleEfObjectContextEdmgenTop10And10);
 
-			var simpleLinq2SqlTop10And10 = Test(
-				() =>
+			Func<int> simpleEfDbContextCodeFirstTop10And10 = () =>
+			{
+				using (var ctx = new NorthwindEfDbContextCodeFirst())
 				{
-					using (var ctx = new Linq2SqlDataContext(connectionStringNorthwind))
-					{
-						var list =
-							(
-								from o in ctx.Orders
-								join c in ctx.Customers on o.CustomerID equals c.CustomerID
-								select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
-							).Take(10).ToList();
-						var list2 =
-							(
-								from o in ctx.Orders
-								join c in ctx.Customers on o.CustomerID equals c.CustomerID
-								select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
-							).Take(10).ToList();
-						return list.Count + list2.Count;
-					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple, Linq2Sql, take 10+10 (n = {0}) = {1} ms", hot, simpleLinq2SqlTop10And10);
+					var list =
+						(
+							from o in ctx.Orders
+							join c in ctx.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					var list2 =
+						(
+							from o in ctx.Orders
+							join c in ctx.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					return list.Count + list2.Count;
+				}
+			};
 
-			var simpleAdoNetTop10And10 = Test(
-				() =>
+			Func<int> simpleEfDbContextDesignerTop10And10 = () =>
+			{
+				using (var ctx = new NorthwindEfDbContextDesignerEntities())
 				{
-					int count = 0;
-					using (var con = new SqlConnection(connectionStringNorthwind))
-					{
-						con.Open();
-						var sql = @"
+					var list =
+						(
+							from o in ctx.Orders
+							join c in ctx.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					var list2 =
+						(
+							from o in ctx.Orders
+							join c in ctx.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					return list.Count + list2.Count;
+				}
+			};
+
+			Func<int> simpleEfObjectContextEdmgenTop10And10 = () =>
+			{
+				using (var ctx = new EfObjectContextEdmgenEntities(connectionStringObjectContext))
+				{
+					var list =
+						(
+							from o in ctx.Orders
+							join c in ctx.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					var list2 =
+						(
+							from o in ctx.Orders
+							join c in ctx.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					return list.Count + list2.Count;
+				}
+			};
+
+			Func<int> simpleLinq2SqlTop10And10 = () =>
+			{
+				using (var ctx = new Linq2SqlDataContext(connectionStringNorthwind))
+				{
+					var list =
+						(
+							from o in ctx.Orders
+							join c in ctx.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					var list2 =
+						(
+							from o in ctx.Orders
+							join c in ctx.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					return list.Count + list2.Count;
+				}
+			};
+
+			Func<int> simpleAdoNetTop10And10 = () =>
+			{
+				int count = 0;
+				using (var con = new SqlConnection(connectionStringNorthwind))
+				{
+					con.Open();
+					var sql = @"
 SELECT TOP 10 O.OrderID, O.OrderDate, C.Country, C.CompanyName
 FROM Orders O
 JOIN Customers C ON O.CustomerID = C.CustomerID
 							";
-						using (var cmd = new SqlCommand(sql, con))
+					using (var cmd = new SqlCommand(sql, con))
+					{
+						using (var reader = cmd.ExecuteReader())
 						{
-							using (var reader = cmd.ExecuteReader())
+							if (reader.HasRows)
 							{
-								if (reader.HasRows)
+								var list = new List<SimpleQueryRow>();
+								while (reader.Read())
 								{
-									var list = new List<SimpleQueryRow>();
-									while (reader.Read())
+									list.Add(new SimpleQueryRow
 									{
-										list.Add(new SimpleQueryRow
-										{
-											OrderId = reader.GetInt32(0),
-											OrderDate = reader.IsDBNull(1) ? null : (DateTime?)reader.GetDateTime(1),
-											Country = reader.IsDBNull(2) ? null : reader.GetString(2),
-											CompanyName = reader.IsDBNull(3) ? null : reader.GetString(3),
-										});
-									}
-									count = list.Count;
+										OrderId = reader.GetInt32(0),
+										OrderDate = reader.IsDBNull(1) ? null : (DateTime?)reader.GetDateTime(1),
+										Country = reader.IsDBNull(2) ? null : reader.GetString(2),
+										CompanyName = reader.IsDBNull(3) ? null : reader.GetString(3),
+									});
 								}
-							}
-						}
-
-						sql = @"
-SELECT TOP 10 O.OrderID, O.OrderDate, C.Country, C.CompanyName
-FROM Orders O
-JOIN Customers C ON O.CustomerID = C.CustomerID
-							";
-						using (var cmd = new SqlCommand(sql, con))
-						{
-							using (var reader = cmd.ExecuteReader())
-							{
-								if (reader.HasRows)
-								{
-									var list = new List<SimpleQueryRow>();
-									while (reader.Read())
-									{
-										list.Add(new SimpleQueryRow
-										{
-											OrderId = reader.GetInt32(0),
-											OrderDate = reader.IsDBNull(1) ? null : (DateTime?)reader.GetDateTime(1),
-											Country = reader.IsDBNull(2) ? null : reader.GetString(2),
-											CompanyName = reader.IsDBNull(3) ? null : reader.GetString(3),
-										});
-									}
-									count += list.Count;
-								}
+								count = list.Count;
 							}
 						}
 					}
-					return count;
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple, ADO.NET, take 10+10 (n = {0}) = {1} ms", hot, simpleAdoNetTop10And10);
 
-			var simpleBltTop10And10 = Test(
-				() =>
-				{
-					using (var db = new DbManager())
+					sql = @"
+SELECT TOP 10 O.OrderID, O.OrderDate, C.Country, C.CompanyName
+FROM Orders O
+JOIN Customers C ON O.CustomerID = C.CustomerID
+							";
+					using (var cmd = new SqlCommand(sql, con))
 					{
-						var sql = @"
-SELECT TOP 10 O.OrderID, O.OrderDate, C.Country, C.CompanyName
-FROM Orders O
-JOIN Customers C ON O.CustomerID = C.CustomerID
-							";
-						var list = db.SetCommand(sql).ExecuteList<SimpleQueryRow>();
-
-						sql = @"
-SELECT TOP 10 O.OrderID, O.OrderDate, C.Country, C.CompanyName
-FROM Orders O
-JOIN Customers C ON O.CustomerID = C.CustomerID
-							";
-						var list2 = db.SetCommand(sql).ExecuteList<SimpleQueryRow>();
-
-						return list.Count + list2.Count;
+						using (var reader = cmd.ExecuteReader())
+						{
+							if (reader.HasRows)
+							{
+								var list = new List<SimpleQueryRow>();
+								while (reader.Read())
+								{
+									list.Add(new SimpleQueryRow
+									{
+										OrderId = reader.GetInt32(0),
+										OrderDate = reader.IsDBNull(1) ? null : (DateTime?)reader.GetDateTime(1),
+										Country = reader.IsDBNull(2) ? null : reader.GetString(2),
+										CompanyName = reader.IsDBNull(3) ? null : reader.GetString(3),
+									});
+								}
+								count += list.Count;
+							}
+						}
 					}
-				},
-				cold,
-				hot);
-			Console.WriteLine("simple, BLToolkit, take 10+10 (n = {0}) = {1} ms", hot, simpleBltTop10And10);
+				}
+				return count;
+			};
+
+			Func<int> simpleBltTop10And10 = () =>
+			{
+				using (var db = new DbManager())
+				{
+					var sql = @"
+SELECT TOP 10 O.OrderID, O.OrderDate, C.Country, C.CompanyName
+FROM Orders O
+JOIN Customers C ON O.CustomerID = C.CustomerID
+							";
+					var list = db.SetCommand(sql).ExecuteList<SimpleQueryRow>();
+
+					sql = @"
+SELECT TOP 10 O.OrderID, O.OrderDate, C.Country, C.CompanyName
+FROM Orders O
+JOIN Customers C ON O.CustomerID = C.CustomerID
+							";
+					var list2 = db.SetCommand(sql).ExecuteList<SimpleQueryRow>();
+
+					return list.Count + list2.Count;
+				}
+			};
+
+
+
+
+
+
+
+			var testsToRun = new List<Tuple<Func<int>, string>>
+			{
+				new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstTop10, "simple, EfDbContextCodeFirst, take 10"),
+				new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstTop500, "simple, EfDbContextCodeFirst, take 500"),
+				new Tuple<Func<int>, string>(simpleEfDbContextDesignerTop10, "simple, EfDbContextDesigner, take 10"),
+				new Tuple<Func<int>, string>(simpleEfDbContextDesignerTop500, "simple, EfDbContextDesigner, take 500"),
+				new Tuple<Func<int>, string>(simpleEfObjectContextEdmgenTop10, "simple, EfObjectContextEdmgen, take 10"),
+				new Tuple<Func<int>, string>(simpleEfObjectContextEdmgenTop500, "simple, EfObjectContextEdmgen, take 500"),
+				new Tuple<Func<int>, string>(simpleEfObjectContextEdmgenTop10Compiled, "simple compiled, EfObjectContextEdmgen, take 10"),
+				new Tuple<Func<int>, string>(simpleEfObjectContextEdmgenTop500Compiled, "simple compiled, EfObjectContextEdmgen, take 500"),
+				new Tuple<Func<int>, string>(simpleLinq2SqlTop10, "simple, Linq2Sql, take 10"),
+				new Tuple<Func<int>, string>(simpleLinq2SqlTop500, "simple, Linq2Sql, take 500"),
+				new Tuple<Func<int>, string>(simpleAdoNetTop10, "simple, ADO.NET, take 10"),
+				new Tuple<Func<int>, string>(simpleAdoNetTop500, "simple, ADO.NET, take 500"),
+				new Tuple<Func<int>, string>(simpleBltTop10, "simple, BLToolkit, take 10"),
+				new Tuple<Func<int>, string>(simpleBltTop500, "simple, BLToolkit, take 500"),
+				new Tuple<Func<int>, string>(complexEfDbContextCodeFirstTop10, "complex, EfDbContextCodeFirst, take 10"),
+				new Tuple<Func<int>, string>(complexEfDbContextCodeFirstTop500, "complex, EfDbContextCodeFirst, take 500"),
+				new Tuple<Func<int>, string>(complexEfDbContextDesignerTop10, "complex, EfDbContextDesigner, take 10"),
+				new Tuple<Func<int>, string>(complexEfDbContextDesignerTop500, "complex, EfDbContextDesigner, take 500"),
+				new Tuple<Func<int>, string>(complexEfObjectContextEdmgenTop10, "complex, EfObjectContextEdmgen, take 10"),
+				new Tuple<Func<int>, string>(complexEfObjectContextEdmgenTop500, "complex, EfObjectContextEdmgen, take 500"),
+				new Tuple<Func<int>, string>(complexLinq2SqlTop10, "complex, Linq2Sql, take 10"),
+				new Tuple<Func<int>, string>(complexLinq2SqlTop500, "complex, Linq2Sql, take 500"),
+				new Tuple<Func<int>, string>(complexAdoNetTop10, "complex, ADO.NET, take 10"),
+				new Tuple<Func<int>, string>(complexAdoNetTop500, "complex, ADO.NET, take 500"),
+				new Tuple<Func<int>, string>(complexBltTop10, "complex, BLToolkit, take 10"),
+				new Tuple<Func<int>, string>(complexBltTop500, "complex, BLToolkit, take 500"),
+				new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstTop10And10, "simple, EfDbContextCodeFirst, take 10+10"),
+				new Tuple<Func<int>, string>(simpleEfDbContextDesignerTop10And10, "simple, EfDbContextDesigner, take 10+10"),
+				new Tuple<Func<int>, string>(simpleEfObjectContextEdmgenTop10And10, "simple, EfObjectContextEdmgen, take 10+10"),
+				new Tuple<Func<int>, string>(simpleLinq2SqlTop10And10, "simple, Linq2Sql, take 10+10"),
+				new Tuple<Func<int>, string>(simpleAdoNetTop10And10, "simple, ADO.NET, take 10+10"),
+				new Tuple<Func<int>, string>(simpleBltTop10And10, "simple, BLToolkit, take 10+10"),
+			};
+
+
+			
+			
+
+
+
+			Console.WriteLine("Tests configuration:");
+			Console.WriteLine("cold = " + cold);
+			Console.WriteLine("hot = " + hot);
+			Console.WriteLine("---");
+
+
+			foreach (var testItem in testsToRun)
+			{
+				var result = Test(testItem.Item1, cold, hot);
+				Console.WriteLine("{0} = {1} ms", testItem.Item2, result);
+			}
 
 
 
