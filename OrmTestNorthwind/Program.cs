@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Configuration;
 using System.Diagnostics;
 using EfDbContextDesigner.EfDbContextDesigner;
+using LinqToDB.Data;
 using OrmTestNorthwind.EfDbContextCodeFirst;
 using OrmTestNorthwind.EfObjectContextEdmgen;
 using System.Data.SqlClient;
@@ -23,6 +24,7 @@ namespace OrmTestNorthwind
 
 			var connectionStringObjectContext = ConfigurationManager.ConnectionStrings["EfObjectContextEdmgen"].ConnectionString;
 			var connectionStringNorthwind = ConfigurationManager.ConnectionStrings["Northwind"].ConnectionString;
+			var linq2dbConfiguration = "NorthWindLinq2db";
 			DbManager.AddConnectionString(connectionStringNorthwind);
 
 			var categoryIds = new[] { 1, 2, 3, 4, 5, 6, 7, 8 };
@@ -290,6 +292,62 @@ FROM Orders O
 JOIN Customers C ON O.CustomerID = C.CustomerID
 							";
 					var list = db.SetCommand(sql).ExecuteList<SimpleQueryRow>();
+					return list.Count;
+				}
+			};
+
+			Func<int> simpleLinq2DbTop10 = () =>
+			{
+				using (var db = new DataModels.NorthwindDB(linq2dbConfiguration))
+				{
+					var list =
+						(
+							from o in db.Orders
+							join c in db.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					return list.Count;
+				}
+			};
+
+			Func<int> simpleLinq2DbTop500 = () =>
+			{
+				using (var db = new DataModels.NorthwindDB(linq2dbConfiguration))
+				{
+					var list =
+						(
+							from o in db.Orders
+							join c in db.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(500).ToList();
+					return list.Count;
+				}
+			};
+
+			Func<int> simpleLinq2DbRawTop10 = () =>
+			{
+				using (var db = new DataModels.NorthwindDB(linq2dbConfiguration))
+				{
+					var sql = @"
+SELECT TOP 10 O.OrderID, O.OrderDate, C.Country, C.CompanyName
+FROM Orders O
+JOIN Customers C ON O.CustomerID = C.CustomerID
+							";
+					var list = db.Query<SimpleQueryRow>(sql).ToList();
+					return list.Count;
+				}
+			};
+
+			Func<int> simpleLinq2DbRawTop500 = () =>
+			{
+				using (var db = new DataModels.NorthwindDB(linq2dbConfiguration))
+				{
+					var sql = @"
+SELECT TOP 500 O.OrderID, O.OrderDate, C.Country, C.CompanyName
+FROM Orders O
+JOIN Customers C ON O.CustomerID = C.CustomerID
+							";
+					var list = db.Query<SimpleQueryRow>(sql).ToList();
 					return list.Count;
 				}
 			};
@@ -596,6 +654,90 @@ ORDER BY OD.Discount DESC
 				}
 			};
 
+			Func<int> complexLinq2DbTop10 = () =>
+			{
+				using (var db = new DataModels.NorthwindDB(linq2dbConfiguration))
+				{
+					var list =
+						(
+							from o in db.Orders
+							join od in db.OrderDetails on o.OrderID equals od.OrderID
+							join p in db.Products on od.ProductID equals p.ProductID
+							join cat in db.Categories on p.CategoryID equals cat.CategoryID
+							join s in db.Suppliers on p.SupplierID equals s.SupplierID
+							where categoryIds.Contains(cat.CategoryID)
+								&& supplierIds.Contains(s.SupplierID)
+							orderby od.Discount descending
+							select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
+						).Take(10).ToList();
+					return list.Count;
+				}
+			};
+
+			Func<int> complexLinq2DbTop500 = () =>
+			{
+				using (var db = new DataModels.NorthwindDB(linq2dbConfiguration))
+				{
+					var list =
+						(
+							from o in db.Orders
+							join od in db.OrderDetails on o.OrderID equals od.OrderID
+							join p in db.Products on od.ProductID equals p.ProductID
+							join cat in db.Categories on p.CategoryID equals cat.CategoryID
+							join s in db.Suppliers on p.SupplierID equals s.SupplierID
+							where categoryIds.Contains(cat.CategoryID)
+								&& supplierIds.Contains(s.SupplierID)
+							orderby od.Discount descending
+							select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
+						).Take(500).ToList();
+					return list.Count;
+				}
+			};
+
+			Func<int> complexLinq2DbRawTop10 = () =>
+			{
+				using (var db = new DataModels.NorthwindDB(linq2dbConfiguration))
+				{
+					var sql = @"
+SELECT TOP 10 OD.Quantity, OD.UnitPrice, OD.Discount, O.ShipCountry, S.Country
+FROM Orders O
+JOIN [Order Details] OD ON O.OrderID = OD.OrderID
+JOIN Products P ON OD.ProductID = P.ProductID
+JOIN Categories Cat ON P.CategoryID = Cat.CategoryID
+JOIN Suppliers S ON P.SupplierID = S.SupplierID
+WHERE
+	Cat.CategoryID IN (@categoryIds)
+	AND S.SupplierID IN (@supplierIds)
+ORDER BY OD.Discount DESC
+						".Replace("@categoryIds", string.Join(",", categoryIds))
+						 .Replace("@supplierIds", string.Join(",", supplierIds));
+					var list = db.Query<ComplexQueryRow>(sql).ToList();
+					return list.Count;
+				}
+			};
+
+			Func<int> complexLinq2DbRawTop500 = () =>
+			{
+				using (var db = new DataModels.NorthwindDB(linq2dbConfiguration))
+				{
+					var sql = @"
+SELECT TOP 500 OD.Quantity, OD.UnitPrice, OD.Discount, O.ShipCountry, S.Country
+FROM Orders O
+JOIN [Order Details] OD ON O.OrderID = OD.OrderID
+JOIN Products P ON OD.ProductID = P.ProductID
+JOIN Categories Cat ON P.CategoryID = Cat.CategoryID
+JOIN Suppliers S ON P.SupplierID = S.SupplierID
+WHERE
+	Cat.CategoryID IN (@categoryIds)
+	AND S.SupplierID IN (@supplierIds)
+ORDER BY OD.Discount DESC
+						".Replace("@categoryIds", string.Join(",", categoryIds))
+						 .Replace("@supplierIds", string.Join(",", supplierIds));
+					var list = db.Query<ComplexQueryRow>(sql).ToList();
+					return list.Count;
+				}
+			};
+
 
 
 
@@ -770,6 +912,48 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 				}
 			};
 
+			Func<int> simpleLinq2DbTop10And10 = () =>
+			{
+				using (var db = new DataModels.NorthwindDB(linq2dbConfiguration))
+				{
+					var list =
+						(
+							from o in db.Orders
+							join c in db.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					var list2 =
+						(
+							from o in db.Orders
+							join c in db.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					return list.Count + list2.Count;
+				}
+			};
+
+			Func<int> simpleLinq2DbRawTop10And10 = () =>
+			{
+				using (var db = new DataModels.NorthwindDB(linq2dbConfiguration))
+				{
+					var sql = @"
+SELECT TOP 10 O.OrderID, O.OrderDate, C.Country, C.CompanyName
+FROM Orders O
+JOIN Customers C ON O.CustomerID = C.CustomerID
+							";
+					var list = db.Query<SimpleQueryRow>(sql).ToList();
+
+					sql = @"
+SELECT TOP 10 O.OrderID, O.OrderDate, C.Country, C.CompanyName
+FROM Orders O
+JOIN Customers C ON O.CustomerID = C.CustomerID
+							";
+					var list2 = db.Query<SimpleQueryRow>(sql).ToList();
+
+					return list.Count + list2.Count;
+				}
+			};
+
 
 
 
@@ -780,36 +964,46 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 			{
 				new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstTop10, "simple, EfDbContextCodeFirst, take 10"),
 				new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstTop500, "simple, EfDbContextCodeFirst, take 500"),
-				new Tuple<Func<int>, string>(simpleEfDbContextDesignerTop10, "simple, EfDbContextDesigner, take 10"),
-				new Tuple<Func<int>, string>(simpleEfDbContextDesignerTop500, "simple, EfDbContextDesigner, take 500"),
-				new Tuple<Func<int>, string>(simpleEfObjectContextEdmgenTop10, "simple, EfObjectContextEdmgen, take 10"),
-				new Tuple<Func<int>, string>(simpleEfObjectContextEdmgenTop500, "simple, EfObjectContextEdmgen, take 500"),
-				new Tuple<Func<int>, string>(simpleEfObjectContextEdmgenTop10Compiled, "simple compiled, EfObjectContextEdmgen, take 10"),
-				new Tuple<Func<int>, string>(simpleEfObjectContextEdmgenTop500Compiled, "simple compiled, EfObjectContextEdmgen, take 500"),
-				new Tuple<Func<int>, string>(simpleLinq2SqlTop10, "simple, Linq2Sql, take 10"),
-				new Tuple<Func<int>, string>(simpleLinq2SqlTop500, "simple, Linq2Sql, take 500"),
+				//new Tuple<Func<int>, string>(simpleEfDbContextDesignerTop10, "simple, EfDbContextDesigner, take 10"),
+				//new Tuple<Func<int>, string>(simpleEfDbContextDesignerTop500, "simple, EfDbContextDesigner, take 500"),
+				//new Tuple<Func<int>, string>(simpleEfObjectContextEdmgenTop10, "simple, EfObjectContextEdmgen, take 10"),
+				//new Tuple<Func<int>, string>(simpleEfObjectContextEdmgenTop500, "simple, EfObjectContextEdmgen, take 500"),
+				//new Tuple<Func<int>, string>(simpleEfObjectContextEdmgenTop10Compiled, "simple compiled, EfObjectContextEdmgen, take 10"),
+				//new Tuple<Func<int>, string>(simpleEfObjectContextEdmgenTop500Compiled, "simple compiled, EfObjectContextEdmgen, take 500"),
+				//new Tuple<Func<int>, string>(simpleLinq2SqlTop10, "simple, Linq2Sql, take 10"),
+				//new Tuple<Func<int>, string>(simpleLinq2SqlTop500, "simple, Linq2Sql, take 500"),
 				new Tuple<Func<int>, string>(simpleAdoNetTop10, "simple, ADO.NET, take 10"),
 				new Tuple<Func<int>, string>(simpleAdoNetTop500, "simple, ADO.NET, take 500"),
 				new Tuple<Func<int>, string>(simpleBltTop10, "simple, BLToolkit, take 10"),
 				new Tuple<Func<int>, string>(simpleBltTop500, "simple, BLToolkit, take 500"),
+				new Tuple<Func<int>, string>(simpleLinq2DbTop10, "simple, linq2db, take 10"),
+				new Tuple<Func<int>, string>(simpleLinq2DbTop500, "simple, linq2db, take 500"),
+				new Tuple<Func<int>, string>(simpleLinq2DbRawTop10, "simple, linq2db raw, take 10"),
+				new Tuple<Func<int>, string>(simpleLinq2DbRawTop500, "simple, linq2db raw, take 500"),
 				new Tuple<Func<int>, string>(complexEfDbContextCodeFirstTop10, "complex, EfDbContextCodeFirst, take 10"),
 				new Tuple<Func<int>, string>(complexEfDbContextCodeFirstTop500, "complex, EfDbContextCodeFirst, take 500"),
-				new Tuple<Func<int>, string>(complexEfDbContextDesignerTop10, "complex, EfDbContextDesigner, take 10"),
-				new Tuple<Func<int>, string>(complexEfDbContextDesignerTop500, "complex, EfDbContextDesigner, take 500"),
-				new Tuple<Func<int>, string>(complexEfObjectContextEdmgenTop10, "complex, EfObjectContextEdmgen, take 10"),
-				new Tuple<Func<int>, string>(complexEfObjectContextEdmgenTop500, "complex, EfObjectContextEdmgen, take 500"),
-				new Tuple<Func<int>, string>(complexLinq2SqlTop10, "complex, Linq2Sql, take 10"),
-				new Tuple<Func<int>, string>(complexLinq2SqlTop500, "complex, Linq2Sql, take 500"),
+				//new Tuple<Func<int>, string>(complexEfDbContextDesignerTop10, "complex, EfDbContextDesigner, take 10"),
+				//new Tuple<Func<int>, string>(complexEfDbContextDesignerTop500, "complex, EfDbContextDesigner, take 500"),
+				//new Tuple<Func<int>, string>(complexEfObjectContextEdmgenTop10, "complex, EfObjectContextEdmgen, take 10"),
+				//new Tuple<Func<int>, string>(complexEfObjectContextEdmgenTop500, "complex, EfObjectContextEdmgen, take 500"),
+				//new Tuple<Func<int>, string>(complexLinq2SqlTop10, "complex, Linq2Sql, take 10"),
+				//new Tuple<Func<int>, string>(complexLinq2SqlTop500, "complex, Linq2Sql, take 500"),
 				new Tuple<Func<int>, string>(complexAdoNetTop10, "complex, ADO.NET, take 10"),
 				new Tuple<Func<int>, string>(complexAdoNetTop500, "complex, ADO.NET, take 500"),
 				new Tuple<Func<int>, string>(complexBltTop10, "complex, BLToolkit, take 10"),
 				new Tuple<Func<int>, string>(complexBltTop500, "complex, BLToolkit, take 500"),
+				new Tuple<Func<int>, string>(complexLinq2DbTop10, "complex, linq2db, take 10"),
+				new Tuple<Func<int>, string>(complexLinq2DbTop500, "complex, linq2db, take 500"),
+				new Tuple<Func<int>, string>(complexLinq2DbRawTop10, "complex, linq2db raw, take 10"),
+				new Tuple<Func<int>, string>(complexLinq2DbRawTop500, "complex, linq2db raw, take 500"),
 				new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstTop10And10, "simple, EfDbContextCodeFirst, take 10+10"),
-				new Tuple<Func<int>, string>(simpleEfDbContextDesignerTop10And10, "simple, EfDbContextDesigner, take 10+10"),
-				new Tuple<Func<int>, string>(simpleEfObjectContextEdmgenTop10And10, "simple, EfObjectContextEdmgen, take 10+10"),
-				new Tuple<Func<int>, string>(simpleLinq2SqlTop10And10, "simple, Linq2Sql, take 10+10"),
+				//new Tuple<Func<int>, string>(simpleEfDbContextDesignerTop10And10, "simple, EfDbContextDesigner, take 10+10"),
+				//new Tuple<Func<int>, string>(simpleEfObjectContextEdmgenTop10And10, "simple, EfObjectContextEdmgen, take 10+10"),
+				//new Tuple<Func<int>, string>(simpleLinq2SqlTop10And10, "simple, Linq2Sql, take 10+10"),
 				new Tuple<Func<int>, string>(simpleAdoNetTop10And10, "simple, ADO.NET, take 10+10"),
 				new Tuple<Func<int>, string>(simpleBltTop10And10, "simple, BLToolkit, take 10+10"),
+				new Tuple<Func<int>, string>(simpleLinq2DbTop10And10, "simple, linq2db, take 10+10"),
+				new Tuple<Func<int>, string>(simpleLinq2DbRawTop10And10, "simple, linq2db raw, take 10+10"),
 			};
 
 
@@ -827,7 +1021,7 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 			foreach (var testItem in testsToRun)
 			{
 				var result = Test(testItem.Item1, cold, hot);
-				Console.WriteLine("{0} = {1} ms", testItem.Item2, result);
+				Console.WriteLine("{0,-50} = {1,8} ms", testItem.Item2, result);
 			}
 
 
