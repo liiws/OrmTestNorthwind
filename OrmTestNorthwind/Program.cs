@@ -34,6 +34,7 @@ namespace OrmTestNorthwind
 
 			// SIMPLE QUERY
 
+
 			Func<int> simpleEfDbContextCodeFirstTop10 = () =>
 			{
 				using (var ctx = new NorthwindEfDbContextCodeFirst())
@@ -58,6 +59,34 @@ namespace OrmTestNorthwind
 							join c in ctx.Customers on o.CustomerID equals c.CustomerID
 							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
 							).Take(500).ToList();
+					return list.Count;
+				}
+			};
+
+			Func<int> simpleEfDbContextCodeFirstRawTop10 = () =>
+			{
+				using (var ctx = new NorthwindEfDbContextCodeFirst())
+				{
+					var sql = @"
+SELECT TOP 10 O.OrderID, O.OrderDate, C.Country, C.CompanyName
+FROM Orders O
+JOIN Customers C ON O.CustomerID = C.CustomerID
+							";
+					var list = ctx.Database.SqlQuery<SimpleQueryRow>(sql).ToList();
+					return list.Count;
+				}
+			};
+
+			Func<int> simpleEfDbContextCodeFirstRawTop500 = () =>
+			{
+				using (var ctx = new NorthwindEfDbContextCodeFirst())
+				{
+					var sql = @"
+SELECT TOP 500 O.OrderID, O.OrderDate, C.Country, C.CompanyName
+FROM Orders O
+JOIN Customers C ON O.CustomerID = C.CustomerID
+							";
+					var list = ctx.Database.SqlQuery<SimpleQueryRow>(sql).ToList();
 					return list.Count;
 				}
 			};
@@ -399,6 +428,51 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 					return list.Count;
 				}
 			};
+
+			Func<int> complexEfDbContextCodeFirstRawTop10 = () =>
+			{
+				using (var ctx = new NorthwindEfDbContextCodeFirst())
+				{
+					var sql = @"
+SELECT TOP 10 OD.Quantity, OD.UnitPrice, OD.Discount, O.ShipCountry, S.Country
+FROM Orders O
+JOIN [Order Details] OD ON O.OrderID = OD.OrderID
+JOIN Products P ON OD.ProductID = P.ProductID
+JOIN Categories Cat ON P.CategoryID = Cat.CategoryID
+JOIN Suppliers S ON P.SupplierID = S.SupplierID
+WHERE
+	Cat.CategoryID IN (@categoryIds)
+	AND S.SupplierID IN (@supplierIds)
+ORDER BY OD.Discount DESC
+						".Replace("@categoryIds", string.Join(",", categoryIds))
+						 .Replace("@supplierIds", string.Join(",", supplierIds));
+					var list = ctx.Database.SqlQuery<ComplexQueryRow>(sql).ToList();
+					return list.Count;
+				}
+			};
+
+			Func<int> complexEfDbContextCodeFirstRawTop500 = () =>
+			{
+				using (var ctx = new NorthwindEfDbContextCodeFirst())
+				{
+					var sql = @"
+SELECT TOP 500 OD.Quantity, OD.UnitPrice, OD.Discount, O.ShipCountry, S.Country
+FROM Orders O
+JOIN [Order Details] OD ON O.OrderID = OD.OrderID
+JOIN Products P ON OD.ProductID = P.ProductID
+JOIN Categories Cat ON P.CategoryID = Cat.CategoryID
+JOIN Suppliers S ON P.SupplierID = S.SupplierID
+WHERE
+	Cat.CategoryID IN (@categoryIds)
+	AND S.SupplierID IN (@supplierIds)
+ORDER BY OD.Discount DESC
+						".Replace("@categoryIds", string.Join(",", categoryIds))
+						 .Replace("@supplierIds", string.Join(",", supplierIds));
+					var list = ctx.Database.SqlQuery<ComplexQueryRow>(sql).ToList();
+					return list.Count;
+				}
+			};
+
 
 			Func<int> complexEfDbContextDesignerTop10 = () =>
 			{
@@ -767,6 +841,28 @@ ORDER BY OD.Discount DESC
 				}
 			};
 
+			Func<int> simpleEfDbContextCodeFirstRawTop10And10 = () =>
+			{
+				using (var ctx = new NorthwindEfDbContextCodeFirst())
+				{
+					var sql = @"
+SELECT TOP 10 O.OrderID, O.OrderDate, C.Country, C.CompanyName
+FROM Orders O
+JOIN Customers C ON O.CustomerID = C.CustomerID
+							";
+					var list = ctx.Database.SqlQuery<SimpleQueryRow>(sql).ToList();
+
+					sql = @"
+SELECT TOP 10 O.OrderID, O.OrderDate, C.Country, C.CompanyName
+FROM Orders O
+JOIN Customers C ON O.CustomerID = C.CustomerID
+							";
+					var list2 = ctx.Database.SqlQuery<SimpleQueryRow>(sql).ToList();
+
+					return list.Count + list2.Count;
+				}
+			};
+
 			Func<int> simpleEfDbContextDesignerTop10And10 = () =>
 			{
 				using (var ctx = new NorthwindEfDbContextDesignerEntities())
@@ -964,6 +1060,8 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 			{
 				new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstTop10, "simple, EfDbContextCodeFirst, take 10"),
 				new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstTop500, "simple, EfDbContextCodeFirst, take 500"),
+				new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstRawTop10, "simple, EfDbContextCodeFirst raw, take 10"),
+				new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstRawTop500, "simple, EfDbContextCodeFirst raw, take 500"),
 				//new Tuple<Func<int>, string>(simpleEfDbContextDesignerTop10, "simple, EfDbContextDesigner, take 10"),
 				//new Tuple<Func<int>, string>(simpleEfDbContextDesignerTop500, "simple, EfDbContextDesigner, take 500"),
 				//new Tuple<Func<int>, string>(simpleEfObjectContextEdmgenTop10, "simple, EfObjectContextEdmgen, take 10"),
@@ -982,6 +1080,8 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 				new Tuple<Func<int>, string>(simpleLinq2DbRawTop500, "simple, linq2db raw, take 500"),
 				new Tuple<Func<int>, string>(complexEfDbContextCodeFirstTop10, "complex, EfDbContextCodeFirst, take 10"),
 				new Tuple<Func<int>, string>(complexEfDbContextCodeFirstTop500, "complex, EfDbContextCodeFirst, take 500"),
+				new Tuple<Func<int>, string>(complexEfDbContextCodeFirstRawTop10, "complex, EfDbContextCodeFirst raw, take 10"),
+				new Tuple<Func<int>, string>(complexEfDbContextCodeFirstRawTop500, "complex, EfDbContextCodeFirst raw, take 500"),
 				//new Tuple<Func<int>, string>(complexEfDbContextDesignerTop10, "complex, EfDbContextDesigner, take 10"),
 				//new Tuple<Func<int>, string>(complexEfDbContextDesignerTop500, "complex, EfDbContextDesigner, take 500"),
 				//new Tuple<Func<int>, string>(complexEfObjectContextEdmgenTop10, "complex, EfObjectContextEdmgen, take 10"),
@@ -997,6 +1097,7 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 				new Tuple<Func<int>, string>(complexLinq2DbRawTop10, "complex, linq2db raw, take 10"),
 				new Tuple<Func<int>, string>(complexLinq2DbRawTop500, "complex, linq2db raw, take 500"),
 				new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstTop10And10, "simple, EfDbContextCodeFirst, take 10+10"),
+				new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstRawTop10And10, "simple, EfDbContextCodeFirst raw, take 10+10"),
 				//new Tuple<Func<int>, string>(simpleEfDbContextDesignerTop10And10, "simple, EfDbContextDesigner, take 10+10"),
 				//new Tuple<Func<int>, string>(simpleEfObjectContextEdmgenTop10And10, "simple, EfObjectContextEdmgen, take 10+10"),
 				//new Tuple<Func<int>, string>(simpleLinq2SqlTop10And10, "simple, Linq2Sql, take 10+10"),

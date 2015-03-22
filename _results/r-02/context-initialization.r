@@ -1,8 +1,8 @@
 mydata <- data.frame(
-    row.names=c("DbContext\nCodeFirst","ADO.NET","BLToolkit\nraw","LINQ to DB","LINQ to DB\nraw SQL"),
-    Values=c(0.226, 0.042, 0.056, 0.106, 0.034))
+    row.names=c("CodeFirst","CodeFirst\nraw SQL","ADO.NET","BLToolkit\nraw","LINQ to DB","LINQ to DB\nraw SQL"),
+    Values=c(0.225, 0.137, 0.047, 0.053, 0.119, 0.034))
 
-dev.new(width=5, height=5)
+dev.new(width=6, height=5)
 
 plot_top = max(mydata$Values)*1.05
 
