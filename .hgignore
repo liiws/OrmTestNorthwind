@@ -7,3 +7,4 @@ EfDbContextDesigner/bin
 EfDbContextDesigner/obj
 OrmTestNorthwind/bin
 OrmTestNorthwind/obj
+packages/linq2db*
