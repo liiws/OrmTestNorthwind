@@ -382,6 +382,34 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 			};
 
 
+			Func<int> simpleEfCoreTop10 = () =>
+			{
+				using (var db = new EfCore.EfCoreModels.NorthwindContext())
+				{
+					var list =
+						(
+							from o in db.Orders
+							join c in db.Customers on o.CustomerId equals c.CustomerId
+							select new { o.OrderId, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					return list.Count;
+				}
+			};
+
+			Func<int> simpleEfCoreTop500 = () =>
+			{
+				using (var db = new EfCore.EfCoreModels.NorthwindContext())
+				{
+					var list =
+						(
+							from o in db.Orders
+							join c in db.Customers on o.CustomerId equals c.CustomerId
+							select new { o.OrderId, o.OrderDate, c.Country, c.CompanyName }
+						).Take(500).ToList();
+					return list.Count;
+				}
+			};
+
 
 
 
@@ -813,6 +841,46 @@ ORDER BY OD.Discount DESC
 			};
 
 
+			Func<int> complexEfCoreTop10 = () =>
+			{
+				using (var db = new EfCore.EfCoreModels.NorthwindContext())
+				{
+					var list =
+						(
+							from o in db.Orders
+							join od in db.OrderDetails on o.OrderId equals od.OrderId
+							join p in db.Products on od.ProductId equals p.ProductId
+							join cat in db.Categories on p.CategoryId equals cat.CategoryId
+							join s in db.Suppliers on p.SupplierId equals s.SupplierId
+							where categoryIds.Contains(cat.CategoryId)
+								&& supplierIds.Contains(s.SupplierId)
+							orderby od.Discount descending
+							select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
+						).Take(10).ToList();
+					return list.Count;
+				}
+			};
+
+			Func<int> complexEfCoreTop500 = () =>
+			{
+				using (var db = new EfCore.EfCoreModels.NorthwindContext())
+				{
+					var list =
+						(
+							from o in db.Orders
+							join od in db.OrderDetails on o.OrderId equals od.OrderId
+							join p in db.Products on od.ProductId equals p.ProductId
+							join cat in db.Categories on p.CategoryId equals cat.CategoryId
+							join s in db.Suppliers on p.SupplierId equals s.SupplierId
+							where categoryIds.Contains(cat.CategoryId)
+								&& supplierIds.Contains(s.SupplierId)
+							orderby od.Discount descending
+							select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
+						).Take(500).ToList();
+					return list.Count;
+				}
+			};
+
 
 
 
@@ -1051,6 +1119,27 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 			};
 
 
+			Func<int> simpleEfCoreTop10And10 = () =>
+			{
+				using (var db = new EfCore.EfCoreModels.NorthwindContext())
+				{
+					var list =
+						(
+							from o in db.Orders
+							join c in db.Customers on o.CustomerId equals c.CustomerId
+							select new { o.OrderId, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					var list2 =
+						(
+							from o in db.Orders
+							join c in db.Customers on o.CustomerId equals c.CustomerId
+							select new { o.OrderId, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					return list.Count + list2.Count;
+				}
+			};
+
+
 
 
 
@@ -1078,6 +1167,9 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 				new Tuple<Func<int>, string>(simpleLinq2DbTop500, "simple, linq2db, take 500"),
 				new Tuple<Func<int>, string>(simpleLinq2DbRawTop10, "simple, linq2db raw, take 10"),
 				new Tuple<Func<int>, string>(simpleLinq2DbRawTop500, "simple, linq2db raw, take 500"),
+				new Tuple<Func<int>, string>(simpleEfCoreTop10, "simple, EfCore, take 10"),
+				new Tuple<Func<int>, string>(simpleEfCoreTop500, "simple, EfCore, take 500"),
+
 				new Tuple<Func<int>, string>(complexEfDbContextCodeFirstTop10, "complex, EfDbContextCodeFirst, take 10"),
 				new Tuple<Func<int>, string>(complexEfDbContextCodeFirstTop500, "complex, EfDbContextCodeFirst, take 500"),
 				new Tuple<Func<int>, string>(complexEfDbContextCodeFirstRawTop10, "complex, EfDbContextCodeFirst raw, take 10"),
@@ -1096,6 +1188,9 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 				new Tuple<Func<int>, string>(complexLinq2DbTop500, "complex, linq2db, take 500"),
 				new Tuple<Func<int>, string>(complexLinq2DbRawTop10, "complex, linq2db raw, take 10"),
 				new Tuple<Func<int>, string>(complexLinq2DbRawTop500, "complex, linq2db raw, take 500"),
+				new Tuple<Func<int>, string>(complexEfCoreTop10, "complex, EfCore, take 10"),
+				new Tuple<Func<int>, string>(complexEfCoreTop500, "complex, EfCore, take 500"),
+
 				new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstTop10And10, "simple, EfDbContextCodeFirst, take 10+10"),
 				new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstRawTop10And10, "simple, EfDbContextCodeFirst raw, take 10+10"),
 				//new Tuple<Func<int>, string>(simpleEfDbContextDesignerTop10And10, "simple, EfDbContextDesigner, take 10+10"),
@@ -1105,11 +1200,12 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 				//new Tuple<Func<int>, string>(simpleBltTop10And10, "simple, BLToolkit, take 10+10"),
 				new Tuple<Func<int>, string>(simpleLinq2DbTop10And10, "simple, linq2db, take 10+10"),
 				new Tuple<Func<int>, string>(simpleLinq2DbRawTop10And10, "simple, linq2db raw, take 10+10"),
+				new Tuple<Func<int>, string>(simpleEfCoreTop10And10, "simple, EfCore, take 10+10"),
 			};
 
 
-			
-			
+
+
 
 
 

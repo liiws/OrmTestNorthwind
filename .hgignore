@@ -8,3 +8,9 @@ EfDbContextDesigner/obj
 OrmTestNorthwind/bin
 OrmTestNorthwind/obj
 packages/linq2db*
+EfCore/bin
+EfCore/obj
+packages/Microsoft*
+packages/NETStandard*
+packages/Remotion*
+packages/System*
