@@ -22,7 +22,7 @@ namespace DataModels
 	/// <summary>
 	/// Database       : Northwind
 	/// Data Source    : 127.0.0.1
-	/// Server Version : 12.00.2000
+	/// Server Version : 13.00.4001
 	/// </summary>
 	public partial class NorthwindDB : LinqToDB.Data.DataConnection
 	{
@@ -100,8 +100,7 @@ namespace DataModels
 		#endregion
 	}
 
-	// View
-	[Table(Schema="dbo", Name="Alphabetical list of products")]
+	[Table(Schema="dbo", Name="Alphabetical list of products", IsView=true)]
 	public partial class AlphabeticalListOfProduct
 	{
 		[Column, NotNull    ] public int      ProductID       { get; set; } // int
@@ -130,22 +129,20 @@ namespace DataModels
 		/// <summary>
 		/// FK_Products_Categories_BackReference
 		/// </summary>
-		[Association(ThisKey="CategoryID", OtherKey="CategoryID", CanBeNull=true, IsBackReference=true)]
+		[Association(ThisKey="CategoryID", OtherKey="CategoryID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<Product> Products { get; set; }
 
 		#endregion
 	}
 
-	// View
-	[Table(Schema="dbo", Name="Category Sales for 1997")]
+	[Table(Schema="dbo", Name="Category Sales for 1997", IsView=true)]
 	public partial class CategorySalesFor1997
 	{
 		[Column, NotNull    ] public string   CategoryName  { get; set; } // nvarchar(15)
 		[Column,    Nullable] public decimal? CategorySales { get; set; } // money
 	}
 
-	// View
-	[Table(Schema="dbo", Name="Current Product List")]
+	[Table(Schema="dbo", Name="Current Product List", IsView=true)]
 	public partial class CurrentProductList
 	{
 		[Identity         ] public int    ProductID   { get; set; } // int
@@ -172,20 +169,19 @@ namespace DataModels
 		/// <summary>
 		/// FK_Orders_Customers_BackReference
 		/// </summary>
-		[Association(ThisKey="CustomerID", OtherKey="CustomerID", CanBeNull=true, IsBackReference=true)]
+		[Association(ThisKey="CustomerID", OtherKey="CustomerID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<Order> Orders { get; set; }
 
 		/// <summary>
 		/// FK_CustomerCustomerDemo_Customers_BackReference
 		/// </summary>
-		[Association(ThisKey="CustomerID", OtherKey="CustomerID", CanBeNull=true, IsBackReference=true)]
+		[Association(ThisKey="CustomerID", OtherKey="CustomerID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<CustomerCustomerDemo> CustomerCustomerDemoes { get; set; }
 
 		#endregion
 	}
 
-	// View
-	[Table(Schema="dbo", Name="Customer and Suppliers by City")]
+	[Table(Schema="dbo", Name="Customer and Suppliers by City", IsView=true)]
 	public partial class CustomerAndSuppliersByCity
 	{
 		[Column,    Nullable] public string City         { get; set; } // nvarchar(15)
@@ -203,16 +199,16 @@ namespace DataModels
 		#region Associations
 
 		/// <summary>
-		/// FK_CustomerCustomerDemo
-		/// </summary>
-		[Association(ThisKey="CustomerTypeID", OtherKey="CustomerTypeID", CanBeNull=false, KeyName="FK_CustomerCustomerDemo", BackReferenceName="CustomerCustomerDemoes")]
-		public CustomerDemographic FK_CustomerCustomerDemo { get; set; }
-
-		/// <summary>
 		/// FK_CustomerCustomerDemo_Customers
 		/// </summary>
-		[Association(ThisKey="CustomerID", OtherKey="CustomerID", CanBeNull=false, KeyName="FK_CustomerCustomerDemo_Customers", BackReferenceName="CustomerCustomerDemoes")]
+		[Association(ThisKey="CustomerID", OtherKey="CustomerID", CanBeNull=false, Relationship=Relationship.ManyToOne, KeyName="FK_CustomerCustomerDemo_Customers", BackReferenceName="CustomerCustomerDemoes")]
 		public Customer Customer { get; set; }
+
+		/// <summary>
+		/// FK_CustomerCustomerDemo
+		/// </summary>
+		[Association(ThisKey="CustomerTypeID", OtherKey="CustomerTypeID", CanBeNull=false, Relationship=Relationship.ManyToOne, KeyName="FK_CustomerCustomerDemo", BackReferenceName="CustomerCustomerDemoes")]
+		public CustomerDemographic FK_CustomerCustomerDemo { get; set; }
 
 		#endregion
 	}
@@ -228,7 +224,7 @@ namespace DataModels
 		/// <summary>
 		/// FK_CustomerCustomerDemo_BackReference
 		/// </summary>
-		[Association(ThisKey="CustomerTypeID", OtherKey="CustomerTypeID", CanBeNull=true, IsBackReference=true)]
+		[Association(ThisKey="CustomerTypeID", OtherKey="CustomerTypeID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<CustomerCustomerDemo> CustomerCustomerDemoes { get; set; }
 
 		#endregion
@@ -261,25 +257,25 @@ namespace DataModels
 		/// <summary>
 		/// FK_Employees_Employees
 		/// </summary>
-		[Association(ThisKey="ReportsTo", OtherKey="EmployeeID", CanBeNull=true, KeyName="FK_Employees_Employees", BackReferenceName="FK_Employees_Employees_BackReferences")]
+		[Association(ThisKey="ReportsTo", OtherKey="EmployeeID", CanBeNull=true, Relationship=Relationship.ManyToOne, KeyName="FK_Employees_Employees", BackReferenceName="FK_Employees_Employees_BackReferences")]
 		public Employee FK_Employees_Employee { get; set; }
 
 		/// <summary>
 		/// FK_Orders_Employees_BackReference
 		/// </summary>
-		[Association(ThisKey="EmployeeID", OtherKey="EmployeeID", CanBeNull=true, IsBackReference=true)]
+		[Association(ThisKey="EmployeeID", OtherKey="EmployeeID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<Order> Orders { get; set; }
 
 		/// <summary>
 		/// FK_EmployeeTerritories_Employees_BackReference
 		/// </summary>
-		[Association(ThisKey="EmployeeID", OtherKey="EmployeeID", CanBeNull=true, IsBackReference=true)]
+		[Association(ThisKey="EmployeeID", OtherKey="EmployeeID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<EmployeeTerritory> EmployeeTerritories { get; set; }
 
 		/// <summary>
 		/// FK_Employees_Employees_BackReference
 		/// </summary>
-		[Association(ThisKey="EmployeeID", OtherKey="ReportsTo", CanBeNull=true, IsBackReference=true)]
+		[Association(ThisKey="EmployeeID", OtherKey="ReportsTo", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<Employee> FK_Employees_Employees_BackReferences { get; set; }
 
 		#endregion
@@ -296,20 +292,19 @@ namespace DataModels
 		/// <summary>
 		/// FK_EmployeeTerritories_Employees
 		/// </summary>
-		[Association(ThisKey="EmployeeID", OtherKey="EmployeeID", CanBeNull=false, KeyName="FK_EmployeeTerritories_Employees", BackReferenceName="EmployeeTerritories")]
+		[Association(ThisKey="EmployeeID", OtherKey="EmployeeID", CanBeNull=false, Relationship=Relationship.ManyToOne, KeyName="FK_EmployeeTerritories_Employees", BackReferenceName="EmployeeTerritories")]
 		public Employee Employee { get; set; }
 
 		/// <summary>
 		/// FK_EmployeeTerritories_Territories
 		/// </summary>
-		[Association(ThisKey="TerritoryID", OtherKey="TerritoryID", CanBeNull=false, KeyName="FK_EmployeeTerritories_Territories", BackReferenceName="EmployeeTerritories")]
+		[Association(ThisKey="TerritoryID", OtherKey="TerritoryID", CanBeNull=false, Relationship=Relationship.ManyToOne, KeyName="FK_EmployeeTerritories_Territories", BackReferenceName="EmployeeTerritories")]
 		public Territory Territory { get; set; }
 
 		#endregion
 	}
 
-	// View
-	[Table(Schema="dbo", Name="Invoices")]
+	[Table(Schema="dbo", Name="Invoices", IsView=true)]
 	public partial class Invoice
 	{
 		[Column,    Nullable] public string    ShipName       { get; set; } // nvarchar(40)
@@ -361,27 +356,27 @@ namespace DataModels
 		#region Associations
 
 		/// <summary>
-		/// FK_Orders_Employees
-		/// </summary>
-		[Association(ThisKey="EmployeeID", OtherKey="EmployeeID", CanBeNull=true, KeyName="FK_Orders_Employees", BackReferenceName="Orders")]
-		public Employee Employee { get; set; }
-
-		/// <summary>
 		/// FK_Orders_Customers
 		/// </summary>
-		[Association(ThisKey="CustomerID", OtherKey="CustomerID", CanBeNull=true, KeyName="FK_Orders_Customers", BackReferenceName="Orders")]
+		[Association(ThisKey="CustomerID", OtherKey="CustomerID", CanBeNull=true, Relationship=Relationship.ManyToOne, KeyName="FK_Orders_Customers", BackReferenceName="Orders")]
 		public Customer Customer { get; set; }
+
+		/// <summary>
+		/// FK_Orders_Employees
+		/// </summary>
+		[Association(ThisKey="EmployeeID", OtherKey="EmployeeID", CanBeNull=true, Relationship=Relationship.ManyToOne, KeyName="FK_Orders_Employees", BackReferenceName="Orders")]
+		public Employee Employee { get; set; }
 
 		/// <summary>
 		/// FK_Orders_Shippers
 		/// </summary>
-		[Association(ThisKey="ShipVia", OtherKey="ShipperID", CanBeNull=true, KeyName="FK_Orders_Shippers", BackReferenceName="Orders")]
+		[Association(ThisKey="ShipVia", OtherKey="ShipperID", CanBeNull=true, Relationship=Relationship.ManyToOne, KeyName="FK_Orders_Shippers", BackReferenceName="Orders")]
 		public Shipper Shipper { get; set; }
 
 		/// <summary>
 		/// FK_Order_Details_Orders_BackReference
 		/// </summary>
-		[Association(ThisKey="OrderID", OtherKey="OrderID", CanBeNull=true, IsBackReference=true)]
+		[Association(ThisKey="OrderID", OtherKey="OrderID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<OrderDetail> OrderDetails { get; set; }
 
 		#endregion
@@ -401,20 +396,19 @@ namespace DataModels
 		/// <summary>
 		/// FK_Order_Details_Orders
 		/// </summary>
-		[Association(ThisKey="OrderID", OtherKey="OrderID", CanBeNull=false, KeyName="FK_Order_Details_Orders", BackReferenceName="OrderDetails")]
+		[Association(ThisKey="OrderID", OtherKey="OrderID", CanBeNull=false, Relationship=Relationship.ManyToOne, KeyName="FK_Order_Details_Orders", BackReferenceName="OrderDetails")]
 		public Order OrderDetailsOrder { get; set; }
 
 		/// <summary>
 		/// FK_Order_Details_Products
 		/// </summary>
-		[Association(ThisKey="ProductID", OtherKey="ProductID", CanBeNull=false, KeyName="FK_Order_Details_Products", BackReferenceName="OrderDetails")]
+		[Association(ThisKey="ProductID", OtherKey="ProductID", CanBeNull=false, Relationship=Relationship.ManyToOne, KeyName="FK_Order_Details_Products", BackReferenceName="OrderDetails")]
 		public Product OrderDetailsProduct { get; set; }
 
 		#endregion
 	}
 
-	// View
-	[Table(Schema="dbo", Name="Order Details Extended")]
+	[Table(Schema="dbo", Name="Order Details Extended", IsView=true)]
 	public partial class OrderDetailsExtended
 	{
 		[Column, NotNull    ] public int      OrderID       { get; set; } // int
@@ -426,8 +420,7 @@ namespace DataModels
 		[Column,    Nullable] public decimal? ExtendedPrice { get; set; } // money
 	}
 
-	// View
-	[Table(Schema="dbo", Name="Orders Qry")]
+	[Table(Schema="dbo", Name="Orders Qry", IsView=true)]
 	public partial class OrdersQry
 	{
 		[Column, NotNull    ] public int       OrderID        { get; set; } // int
@@ -452,8 +445,7 @@ namespace DataModels
 		[Column,    Nullable] public string    Country        { get; set; } // nvarchar(15)
 	}
 
-	// View
-	[Table(Schema="dbo", Name="Order Subtotals")]
+	[Table(Schema="dbo", Name="Order Subtotals", IsView=true)]
 	public partial class OrderSubtotal
 	{
 		[Column, NotNull    ] public int      OrderID  { get; set; } // int
@@ -473,40 +465,39 @@ namespace DataModels
 		[Column,        Nullable] public short?   UnitsOnOrder    { get; set; } // smallint
 		[Column,        Nullable] public short?   ReorderLevel    { get; set; } // smallint
 		[Column,     NotNull    ] public bool     Discontinued    { get; set; } // bit
+		[Column,        Nullable] public int?     CountLeft       { get; set; } // int
 
 		#region Associations
 
 		/// <summary>
 		/// FK_Products_Suppliers
 		/// </summary>
-		[Association(ThisKey="SupplierID", OtherKey="SupplierID", CanBeNull=true, KeyName="FK_Products_Suppliers", BackReferenceName="Products")]
+		[Association(ThisKey="SupplierID", OtherKey="SupplierID", CanBeNull=true, Relationship=Relationship.ManyToOne, KeyName="FK_Products_Suppliers", BackReferenceName="Products")]
 		public Supplier Supplier { get; set; }
 
 		/// <summary>
 		/// FK_Products_Categories
 		/// </summary>
-		[Association(ThisKey="CategoryID", OtherKey="CategoryID", CanBeNull=true, KeyName="FK_Products_Categories", BackReferenceName="Products")]
+		[Association(ThisKey="CategoryID", OtherKey="CategoryID", CanBeNull=true, Relationship=Relationship.ManyToOne, KeyName="FK_Products_Categories", BackReferenceName="Products")]
 		public Category Category { get; set; }
 
 		/// <summary>
 		/// FK_Order_Details_Products_BackReference
 		/// </summary>
-		[Association(ThisKey="ProductID", OtherKey="ProductID", CanBeNull=true, IsBackReference=true)]
+		[Association(ThisKey="ProductID", OtherKey="ProductID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<OrderDetail> OrderDetails { get; set; }
 
 		#endregion
 	}
 
-	// View
-	[Table(Schema="dbo", Name="Products Above Average Price")]
+	[Table(Schema="dbo", Name="Products Above Average Price", IsView=true)]
 	public partial class ProductsAboveAveragePrice
 	{
 		[Column, NotNull    ] public string   ProductName { get; set; } // nvarchar(40)
 		[Column,    Nullable] public decimal? UnitPrice   { get; set; } // money
 	}
 
-	// View
-	[Table(Schema="dbo", Name="Product Sales for 1997")]
+	[Table(Schema="dbo", Name="Product Sales for 1997", IsView=true)]
 	public partial class ProductSalesFor1997
 	{
 		[Column, NotNull    ] public string   CategoryName { get; set; } // nvarchar(15)
@@ -514,8 +505,7 @@ namespace DataModels
 		[Column,    Nullable] public decimal? ProductSales { get; set; } // money
 	}
 
-	// View
-	[Table(Schema="dbo", Name="Products by Category")]
+	[Table(Schema="dbo", Name="Products by Category", IsView=true)]
 	public partial class ProductsByCategory
 	{
 		[Column, NotNull    ] public string CategoryName    { get; set; } // nvarchar(15)
@@ -525,8 +515,7 @@ namespace DataModels
 		[Column, NotNull    ] public bool   Discontinued    { get; set; } // bit
 	}
 
-	// View
-	[Table(Schema="dbo", Name="Quarterly Orders")]
+	[Table(Schema="dbo", Name="Quarterly Orders", IsView=true)]
 	public partial class QuarterlyOrder
 	{
 		[Column, Nullable] public string CustomerID  { get; set; } // nchar(5)
@@ -546,14 +535,13 @@ namespace DataModels
 		/// <summary>
 		/// FK_Territories_Region_BackReference
 		/// </summary>
-		[Association(ThisKey="RegionID", OtherKey="RegionID", CanBeNull=true, IsBackReference=true)]
+		[Association(ThisKey="RegionID", OtherKey="RegionID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<Territory> Territories { get; set; }
 
 		#endregion
 	}
 
-	// View
-	[Table(Schema="dbo", Name="Sales by Category")]
+	[Table(Schema="dbo", Name="Sales by Category", IsView=true)]
 	public partial class SalesByCategory
 	{
 		[Column, NotNull    ] public int      CategoryID   { get; set; } // int
@@ -562,8 +550,7 @@ namespace DataModels
 		[Column,    Nullable] public decimal? ProductSales { get; set; } // money
 	}
 
-	// View
-	[Table(Schema="dbo", Name="Sales Totals by Amount")]
+	[Table(Schema="dbo", Name="Sales Totals by Amount", IsView=true)]
 	public partial class SalesTotalsByAmount
 	{
 		[Column,    Nullable] public decimal?  SaleAmount  { get; set; } // money
@@ -584,14 +571,13 @@ namespace DataModels
 		/// <summary>
 		/// FK_Orders_Shippers_BackReference
 		/// </summary>
-		[Association(ThisKey="ShipperID", OtherKey="ShipVia", CanBeNull=true, IsBackReference=true)]
+		[Association(ThisKey="ShipperID", OtherKey="ShipVia", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<Order> Orders { get; set; }
 
 		#endregion
 	}
 
-	// View
-	[Table(Schema="dbo", Name="Summary of Sales by Quarter")]
+	[Table(Schema="dbo", Name="Summary of Sales by Quarter", IsView=true)]
 	public partial class SummaryOfSalesByQuarter
 	{
 		[Column,    Nullable] public DateTime? ShippedDate { get; set; } // datetime
@@ -599,8 +585,7 @@ namespace DataModels
 		[Column,    Nullable] public decimal?  Subtotal    { get; set; } // money
 	}
 
-	// View
-	[Table(Schema="dbo", Name="Summary of Sales by Year")]
+	[Table(Schema="dbo", Name="Summary of Sales by Year", IsView=true)]
 	public partial class SummaryOfSalesByYear
 	{
 		[Column,    Nullable] public DateTime? ShippedDate { get; set; } // datetime
@@ -629,7 +614,7 @@ namespace DataModels
 		/// <summary>
 		/// FK_Products_Suppliers_BackReference
 		/// </summary>
-		[Association(ThisKey="SupplierID", OtherKey="SupplierID", CanBeNull=true, IsBackReference=true)]
+		[Association(ThisKey="SupplierID", OtherKey="SupplierID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<Product> Products { get; set; }
 
 		#endregion
@@ -647,13 +632,13 @@ namespace DataModels
 		/// <summary>
 		/// FK_Territories_Region
 		/// </summary>
-		[Association(ThisKey="RegionID", OtherKey="RegionID", CanBeNull=false, KeyName="FK_Territories_Region", BackReferenceName="Territories")]
+		[Association(ThisKey="RegionID", OtherKey="RegionID", CanBeNull=false, Relationship=Relationship.ManyToOne, KeyName="FK_Territories_Region", BackReferenceName="Territories")]
 		public Region Region { get; set; }
 
 		/// <summary>
 		/// FK_EmployeeTerritories_Territories_BackReference
 		/// </summary>
-		[Association(ThisKey="TerritoryID", OtherKey="TerritoryID", CanBeNull=true, IsBackReference=true)]
+		[Association(ThisKey="TerritoryID", OtherKey="TerritoryID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<EmployeeTerritory> EmployeeTerritories { get; set; }
 
 		#endregion
@@ -663,21 +648,27 @@ namespace DataModels
 	{
 		#region CustOrderHist
 
-		public partial class CustOrderHistResult
-		{
-			public string ProductName { get; set; }
-			public int?   Total       { get; set; }
-		}
-
 		public static IEnumerable<CustOrderHistResult> CustOrderHist(this DataConnection dataConnection, string @CustomerID)
 		{
 			return dataConnection.QueryProc<CustOrderHistResult>("[dbo].[CustOrderHist]",
 				new DataParameter("@CustomerID", @CustomerID, DataType.NChar));
 		}
 
+		public partial class CustOrderHistResult
+		{
+			public string ProductName { get; set; }
+			public int?   Total       { get; set; }
+		}
+
 		#endregion
 
 		#region CustOrdersDetail
+
+		public static IEnumerable<CustOrdersDetailResult> CustOrdersDetail(this DataConnection dataConnection, int? @OrderID)
+		{
+			return dataConnection.QueryProc<CustOrdersDetailResult>("[dbo].[CustOrdersDetail]",
+				new DataParameter("@OrderID", @OrderID, DataType.Int32));
+		}
 
 		public partial class CustOrdersDetailResult
 		{
@@ -688,15 +679,15 @@ namespace DataModels
 			public decimal? ExtendedPrice { get; set; }
 		}
 
-		public static IEnumerable<CustOrdersDetailResult> CustOrdersDetail(this DataConnection dataConnection, int? @OrderID)
-		{
-			return dataConnection.QueryProc<CustOrdersDetailResult>("[dbo].[CustOrdersDetail]",
-				new DataParameter("@OrderID", @OrderID, DataType.Int32));
-		}
-
 		#endregion
 
 		#region CustOrdersOrders
+
+		public static IEnumerable<CustOrdersOrdersResult> CustOrdersOrders(this DataConnection dataConnection, string @CustomerID)
+		{
+			return dataConnection.QueryProc<CustOrdersOrdersResult>("[dbo].[CustOrdersOrders]",
+				new DataParameter("@CustomerID", @CustomerID, DataType.NChar));
+		}
 
 		public partial class CustOrdersOrdersResult
 		{
@@ -706,15 +697,16 @@ namespace DataModels
 			public DateTime? ShippedDate  { get; set; }
 		}
 
-		public static IEnumerable<CustOrdersOrdersResult> CustOrdersOrders(this DataConnection dataConnection, string @CustomerID)
-		{
-			return dataConnection.QueryProc<CustOrdersOrdersResult>("[dbo].[CustOrdersOrders]",
-				new DataParameter("@CustomerID", @CustomerID, DataType.NChar));
-		}
-
 		#endregion
 
 		#region EmployeeSalesByCountry
+
+		public static IEnumerable<EmployeeSalesByCountryResult> EmployeeSalesByCountry(this DataConnection dataConnection, DateTime? @Beginning_Date, DateTime? @Ending_Date)
+		{
+			return dataConnection.QueryProc<EmployeeSalesByCountryResult>("[dbo].[Employee Sales by Country]",
+				new DataParameter("@Beginning_Date", @Beginning_Date, DataType.DateTime),
+				new DataParameter("@Ending_Date",    @Ending_Date,    DataType.DateTime));
+		}
 
 		public partial class EmployeeSalesByCountryResult
 		{
@@ -726,16 +718,16 @@ namespace DataModels
 			public decimal?  SaleAmount  { get; set; }
 		}
 
-		public static IEnumerable<EmployeeSalesByCountryResult> EmployeeSalesByCountry(this DataConnection dataConnection, DateTime? @Beginning_Date, DateTime? @Ending_Date)
-		{
-			return dataConnection.QueryProc<EmployeeSalesByCountryResult>("[dbo].[Employee Sales by Country]",
-				new DataParameter("@Beginning_Date", @Beginning_Date, DataType.DateTime),
-				new DataParameter("@Ending_Date",    @Ending_Date,    DataType.DateTime));
-		}
-
 		#endregion
 
 		#region SalesByYear
+
+		public static IEnumerable<SalesByYearResult> SalesByYear(this DataConnection dataConnection, DateTime? @Beginning_Date, DateTime? @Ending_Date)
+		{
+			return dataConnection.QueryProc<SalesByYearResult>("[dbo].[Sales by Year]",
+				new DataParameter("@Beginning_Date", @Beginning_Date, DataType.DateTime),
+				new DataParameter("@Ending_Date",    @Ending_Date,    DataType.DateTime));
+		}
 
 		public partial class SalesByYearResult
 		{
@@ -745,28 +737,21 @@ namespace DataModels
 			public string    Year        { get; set; }
 		}
 
-		public static IEnumerable<SalesByYearResult> SalesByYear(this DataConnection dataConnection, DateTime? @Beginning_Date, DateTime? @Ending_Date)
-		{
-			return dataConnection.QueryProc<SalesByYearResult>("[dbo].[Sales by Year]",
-				new DataParameter("@Beginning_Date", @Beginning_Date, DataType.DateTime),
-				new DataParameter("@Ending_Date",    @Ending_Date,    DataType.DateTime));
-		}
-
 		#endregion
 
 		#region SalesByCategory
-
-		public partial class SalesByCategoryResult
-		{
-			public string   ProductName   { get; set; }
-			public decimal? TotalPurchase { get; set; }
-		}
 
 		public static IEnumerable<SalesByCategoryResult> SalesByCategory(this DataConnection dataConnection, string @CategoryName, string @OrdYear)
 		{
 			return dataConnection.QueryProc<SalesByCategoryResult>("[dbo].[SalesByCategory]",
 				new DataParameter("@CategoryName", @CategoryName, DataType.NVarChar),
 				new DataParameter("@OrdYear",      @OrdYear,      DataType.NVarChar));
+		}
+
+		public partial class SalesByCategoryResult
+		{
+			public string   ProductName   { get; set; }
+			public decimal? TotalPurchase { get; set; }
 		}
 
 		#endregion
@@ -810,12 +795,6 @@ namespace DataModels
 
 		#region sp_helpdiagramdefinition
 
-		public partial class sp_helpdiagramdefinitionResult
-		{
-			public int?   version    { get; set; }
-			public byte[] definition { get; set; }
-		}
-
 		public static IEnumerable<sp_helpdiagramdefinitionResult> sp_helpdiagramdefinition(this DataConnection dataConnection, string @diagramname, int? @owner_id)
 		{
 			return dataConnection.QueryProc<sp_helpdiagramdefinitionResult>("[dbo].[sp_helpdiagramdefinition]",
@@ -823,9 +802,22 @@ namespace DataModels
 				new DataParameter("@owner_id",    @owner_id,    DataType.Int32));
 		}
 
+		public partial class sp_helpdiagramdefinitionResult
+		{
+			public int?   version    { get; set; }
+			public byte[] definition { get; set; }
+		}
+
 		#endregion
 
 		#region sp_helpdiagrams
+
+		public static IEnumerable<sp_helpdiagramsResult> sp_helpdiagrams(this DataConnection dataConnection, string @diagramname, int? @owner_id)
+		{
+			return dataConnection.QueryProc<sp_helpdiagramsResult>("[dbo].[sp_helpdiagrams]",
+				new DataParameter("@diagramname", @diagramname, DataType.NVarChar),
+				new DataParameter("@owner_id",    @owner_id,    DataType.Int32));
+		}
 
 		public partial class sp_helpdiagramsResult
 		{
@@ -834,13 +826,6 @@ namespace DataModels
 			public int    ID       { get; set; }
 			public string Owner    { get; set; }
 			public int    OwnerID  { get; set; }
-		}
-
-		public static IEnumerable<sp_helpdiagramsResult> sp_helpdiagrams(this DataConnection dataConnection, string @diagramname, int? @owner_id)
-		{
-			return dataConnection.QueryProc<sp_helpdiagramsResult>("[dbo].[sp_helpdiagrams]",
-				new DataParameter("@diagramname", @diagramname, DataType.NVarChar),
-				new DataParameter("@owner_id",    @owner_id,    DataType.Int32));
 		}
 
 		#endregion
@@ -859,15 +844,15 @@ namespace DataModels
 
 		#region TenMostExpensiveProducts
 
+		public static IEnumerable<TenMostExpensiveProductsResult> TenMostExpensiveProducts(this DataConnection dataConnection)
+		{
+			return dataConnection.QueryProc<TenMostExpensiveProductsResult>("[dbo].[Ten Most Expensive Products]");
+		}
+
 		public partial class TenMostExpensiveProductsResult
 		{
 			public string   TenMostExpensiveProducts { get; set; }
 			public decimal? UnitPrice                { get; set; }
-		}
-
-		public static IEnumerable<TenMostExpensiveProductsResult> TenMostExpensiveProducts(this DataConnection dataConnection)
-		{
-			return dataConnection.QueryProc<TenMostExpensiveProductsResult>("[dbo].[Ten Most Expensive Products]");
 		}
 
 		#endregion
