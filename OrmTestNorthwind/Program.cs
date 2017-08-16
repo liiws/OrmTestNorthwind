@@ -211,19 +211,20 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 			};
 
 
-			//Func<int> simpleEfCoreTop10 = () =>
-			//{
-			//	using (var db = new EfCore.EfCoreModels.NorthwindContext())
-			//	{
-			//		var list =
-			//			(
-			//				from o in db.Orders
-			//				join c in db.Customers on o.CustomerId equals c.CustomerId
-			//				select new { o.OrderId, o.OrderDate, c.Country, c.CompanyName }
-			//			).Take(10).ToList();
-			//		return list.Count;
-			//	}
-			//};
+			Func<int> simpleEfCoreTop10 = () =>
+			{
+				using (var db = new OrmTestNorthwind.EfCoreModels.NorthwindContext())
+				{
+					var list =
+						(
+							from o in db.Orders
+							join c in db.Customers on o.CustomerId equals c.CustomerId
+							select new { o.OrderId, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					return list.Count;
+				}
+				return 1;
+			};
 
 			//Func<int> simpleEfCoreTop500 = () =>
 			//{
@@ -246,89 +247,89 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 
 
 
-//			Func<int> complexEf6CodeFirstTop10 = () =>
-//			{
-//				using (var ctx = new NorthwindEf6CodeFirst())
-//				{
-//					var list =
-//						(
-//							from o in ctx.Orders
-//							join od in ctx.Order_Details on o.OrderID equals od.OrderID
-//							join p in ctx.Products on od.ProductID equals p.ProductID
-//							join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
-//							join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
-//							where categoryIds.Contains(cat.CategoryID)
-//								&& supplierIds.Contains(s.SupplierID)
-//							orderby od.Discount descending
-//							select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
-//						).Take(10).ToList();
-//					return list.Count;
-//				}
-//			};
+			//			Func<int> complexEf6CodeFirstTop10 = () =>
+			//			{
+			//				using (var ctx = new NorthwindEf6CodeFirst())
+			//				{
+			//					var list =
+			//						(
+			//							from o in ctx.Orders
+			//							join od in ctx.Order_Details on o.OrderID equals od.OrderID
+			//							join p in ctx.Products on od.ProductID equals p.ProductID
+			//							join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
+			//							join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
+			//							where categoryIds.Contains(cat.CategoryID)
+			//								&& supplierIds.Contains(s.SupplierID)
+			//							orderby od.Discount descending
+			//							select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
+			//						).Take(10).ToList();
+			//					return list.Count;
+			//				}
+			//			};
 
-//			Func<int> complexEf6CodeFirstTop500 = () =>
-//			{
-//				using (var ctx = new NorthwindEf6CodeFirst())
-//				{
-//					var list =
-//						(
-//							from o in ctx.Orders
-//							join od in ctx.Order_Details on o.OrderID equals od.OrderID
-//							join p in ctx.Products on od.ProductID equals p.ProductID
-//							join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
-//							join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
-//							where categoryIds.Contains(cat.CategoryID)
-//								&& supplierIds.Contains(s.SupplierID)
-//							orderby od.Discount descending
-//							select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
-//						).Take(500).ToList();
-//					return list.Count;
-//				}
-//			};
+			//			Func<int> complexEf6CodeFirstTop500 = () =>
+			//			{
+			//				using (var ctx = new NorthwindEf6CodeFirst())
+			//				{
+			//					var list =
+			//						(
+			//							from o in ctx.Orders
+			//							join od in ctx.Order_Details on o.OrderID equals od.OrderID
+			//							join p in ctx.Products on od.ProductID equals p.ProductID
+			//							join cat in ctx.Categories on p.CategoryID equals cat.CategoryID
+			//							join s in ctx.Suppliers on p.SupplierID equals s.SupplierID
+			//							where categoryIds.Contains(cat.CategoryID)
+			//								&& supplierIds.Contains(s.SupplierID)
+			//							orderby od.Discount descending
+			//							select new { od.Quantity, od.UnitPrice, od.Discount, o.ShipCountry, s.Country }
+			//						).Take(500).ToList();
+			//					return list.Count;
+			//				}
+			//			};
 
-//			Func<int> complexEf6CodeFirstRawTop10 = () =>
-//			{
-//				using (var ctx = new NorthwindEf6CodeFirst())
-//				{
-//					var sql = @"
-//SELECT TOP 10 OD.Quantity, OD.UnitPrice, OD.Discount, O.ShipCountry, S.Country
-//FROM Orders O
-//JOIN [Order Details] OD ON O.OrderID = OD.OrderID
-//JOIN Products P ON OD.ProductID = P.ProductID
-//JOIN Categories Cat ON P.CategoryID = Cat.CategoryID
-//JOIN Suppliers S ON P.SupplierID = S.SupplierID
-//WHERE
-//	Cat.CategoryID IN (@categoryIds)
-//	AND S.SupplierID IN (@supplierIds)
-//ORDER BY OD.Discount DESC
-//						".Replace("@categoryIds", string.Join(",", categoryIds))
-//						 .Replace("@supplierIds", string.Join(",", supplierIds));
-//					var list = ctx.Database.SqlQuery<ComplexQueryRow>(sql).ToList();
-//					return list.Count;
-//				}
-//			};
+			//			Func<int> complexEf6CodeFirstRawTop10 = () =>
+			//			{
+			//				using (var ctx = new NorthwindEf6CodeFirst())
+			//				{
+			//					var sql = @"
+			//SELECT TOP 10 OD.Quantity, OD.UnitPrice, OD.Discount, O.ShipCountry, S.Country
+			//FROM Orders O
+			//JOIN [Order Details] OD ON O.OrderID = OD.OrderID
+			//JOIN Products P ON OD.ProductID = P.ProductID
+			//JOIN Categories Cat ON P.CategoryID = Cat.CategoryID
+			//JOIN Suppliers S ON P.SupplierID = S.SupplierID
+			//WHERE
+			//	Cat.CategoryID IN (@categoryIds)
+			//	AND S.SupplierID IN (@supplierIds)
+			//ORDER BY OD.Discount DESC
+			//						".Replace("@categoryIds", string.Join(",", categoryIds))
+			//						 .Replace("@supplierIds", string.Join(",", supplierIds));
+			//					var list = ctx.Database.SqlQuery<ComplexQueryRow>(sql).ToList();
+			//					return list.Count;
+			//				}
+			//			};
 
-//			Func<int> complexEf6CodeFirstRawTop500 = () =>
-//			{
-//				using (var ctx = new NorthwindEf6CodeFirst())
-//				{
-//					var sql = @"
-//SELECT TOP 500 OD.Quantity, OD.UnitPrice, OD.Discount, O.ShipCountry, S.Country
-//FROM Orders O
-//JOIN [Order Details] OD ON O.OrderID = OD.OrderID
-//JOIN Products P ON OD.ProductID = P.ProductID
-//JOIN Categories Cat ON P.CategoryID = Cat.CategoryID
-//JOIN Suppliers S ON P.SupplierID = S.SupplierID
-//WHERE
-//	Cat.CategoryID IN (@categoryIds)
-//	AND S.SupplierID IN (@supplierIds)
-//ORDER BY OD.Discount DESC
-//						".Replace("@categoryIds", string.Join(",", categoryIds))
-//						 .Replace("@supplierIds", string.Join(",", supplierIds));
-//					var list = ctx.Database.SqlQuery<ComplexQueryRow>(sql).ToList();
-//					return list.Count;
-//				}
-//			};
+			//			Func<int> complexEf6CodeFirstRawTop500 = () =>
+			//			{
+			//				using (var ctx = new NorthwindEf6CodeFirst())
+			//				{
+			//					var sql = @"
+			//SELECT TOP 500 OD.Quantity, OD.UnitPrice, OD.Discount, O.ShipCountry, S.Country
+			//FROM Orders O
+			//JOIN [Order Details] OD ON O.OrderID = OD.OrderID
+			//JOIN Products P ON OD.ProductID = P.ProductID
+			//JOIN Categories Cat ON P.CategoryID = Cat.CategoryID
+			//JOIN Suppliers S ON P.SupplierID = S.SupplierID
+			//WHERE
+			//	Cat.CategoryID IN (@categoryIds)
+			//	AND S.SupplierID IN (@supplierIds)
+			//ORDER BY OD.Discount DESC
+			//						".Replace("@categoryIds", string.Join(",", categoryIds))
+			//						 .Replace("@supplierIds", string.Join(",", supplierIds));
+			//					var list = ctx.Database.SqlQuery<ComplexQueryRow>(sql).ToList();
+			//					return list.Count;
+			//				}
+			//			};
 
 			Func<int> complexAdoNetTop10 = () =>
 			{
@@ -733,13 +734,13 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 				//new Tuple<Func<int>, string>(simpleEf6CodeFirstTop500, "simple, Ef6CodeFirst, take 500"),
 				//new Tuple<Func<int>, string>(simpleEf6CodeFirstRawTop10, "simple, Ef6CodeFirst raw, take 10"),
 				//new Tuple<Func<int>, string>(simpleEf6CodeFirstRawTop500, "simple, Ef6CodeFirst raw, take 500"),
-				new Tuple<Func<int>, string>(simpleAdoNetTop10, "simple, ADO.NET, take 10"),
+				//new Tuple<Func<int>, string>(simpleAdoNetTop10, "simple, ADO.NET, take 10"),
 				//new Tuple<Func<int>, string>(simpleAdoNetTop500, "simple, ADO.NET, take 500"),
 				//new Tuple<Func<int>, string>(simpleLinq2DbTop10, "simple, linq2db, take 10"),
 				//new Tuple<Func<int>, string>(simpleLinq2DbTop500, "simple, linq2db, take 500"),
 				//new Tuple<Func<int>, string>(simpleLinq2DbRawTop10, "simple, linq2db raw, take 10"),
 				//new Tuple<Func<int>, string>(simpleLinq2DbRawTop500, "simple, linq2db raw, take 500"),
-				//new Tuple<Func<int>, string>(simpleEfCoreTop10, "simple, EfCore, take 10"),
+				new Tuple<Func<int>, string>(simpleEfCoreTop10, "simple, EfCore, take 10"),
 				//new Tuple<Func<int>, string>(simpleEfCoreTop500, "simple, EfCore, take 500"),
 
 				//new Tuple<Func<int>, string>(complexEf6CodeFirstTop10, "complex, Ef6CodeFirst, take 10"),
