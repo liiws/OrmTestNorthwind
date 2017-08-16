@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Configuration;
 using System.Diagnostics;
 using LinqToDB.Data;
@@ -28,61 +26,61 @@ namespace OrmTestNorthwind
 			// SIMPLE QUERY
 
 
-//			Func<int> simpleEfDbContextCodeFirstTop10 = () =>
-//			{
-//				using (var ctx = new NorthwindEfDbContextCodeFirst())
-//				{
-//					var list =
-//						(
-//							from o in ctx.Orders
-//							join c in ctx.Customers on o.CustomerID equals c.CustomerID
-//							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
-//						).Take(10).ToList();
-//					return list.Count;
-//				}
-//			};
+			Func<int> simpleEf6CodeFirstTop10 = () =>
+			{
+				using (var ctx = new Ef6CodeFirst.Ef6CodeFirst())
+				{
+					var list =
+						(
+							from o in ctx.Orders
+							join c in ctx.Customers on o.CustomerID equals c.CustomerID
+							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+						).Take(10).ToList();
+					return list.Count;
+				}
+			};
 
-//			Func<int> simpleEfDbContextCodeFirstTop500 = () =>
-//			{
-//				using (var ctx = new NorthwindEfDbContextCodeFirst())
-//				{
-//					var list =
-//						(
-//							from o in ctx.Orders
-//							join c in ctx.Customers on o.CustomerID equals c.CustomerID
-//							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
-//							).Take(500).ToList();
-//					return list.Count;
-//				}
-//			};
+			//			Func<int> simpleEf6CodeFirstTop500 = () =>
+			//			{
+			//				using (var ctx = new NorthwindEf6CodeFirst())
+			//				{
+			//					var list =
+			//						(
+			//							from o in ctx.Orders
+			//							join c in ctx.Customers on o.CustomerID equals c.CustomerID
+			//							select new { o.OrderID, o.OrderDate, c.Country, c.CompanyName }
+			//							).Take(500).ToList();
+			//					return list.Count;
+			//				}
+			//			};
 
-//			Func<int> simpleEfDbContextCodeFirstRawTop10 = () =>
-//			{
-//				using (var ctx = new NorthwindEfDbContextCodeFirst())
-//				{
-//					var sql = @"
-//SELECT TOP 10 O.OrderID, O.OrderDate, C.Country, C.CompanyName
-//FROM Orders O
-//JOIN Customers C ON O.CustomerID = C.CustomerID
-//							";
-//					var list = ctx.Database.SqlQuery<SimpleQueryRow>(sql).ToList();
-//					return list.Count;
-//				}
-//			};
+			//			Func<int> simpleEf6CodeFirstRawTop10 = () =>
+			//			{
+			//				using (var ctx = new NorthwindEf6CodeFirst())
+			//				{
+			//					var sql = @"
+			//SELECT TOP 10 O.OrderID, O.OrderDate, C.Country, C.CompanyName
+			//FROM Orders O
+			//JOIN Customers C ON O.CustomerID = C.CustomerID
+			//							";
+			//					var list = ctx.Database.SqlQuery<SimpleQueryRow>(sql).ToList();
+			//					return list.Count;
+			//				}
+			//			};
 
-//			Func<int> simpleEfDbContextCodeFirstRawTop500 = () =>
-//			{
-//				using (var ctx = new NorthwindEfDbContextCodeFirst())
-//				{
-//					var sql = @"
-//SELECT TOP 500 O.OrderID, O.OrderDate, C.Country, C.CompanyName
-//FROM Orders O
-//JOIN Customers C ON O.CustomerID = C.CustomerID
-//							";
-//					var list = ctx.Database.SqlQuery<SimpleQueryRow>(sql).ToList();
-//					return list.Count;
-//				}
-//			};
+			//			Func<int> simpleEf6CodeFirstRawTop500 = () =>
+			//			{
+			//				using (var ctx = new NorthwindEf6CodeFirst())
+			//				{
+			//					var sql = @"
+			//SELECT TOP 500 O.OrderID, O.OrderDate, C.Country, C.CompanyName
+			//FROM Orders O
+			//JOIN Customers C ON O.CustomerID = C.CustomerID
+			//							";
+			//					var list = ctx.Database.SqlQuery<SimpleQueryRow>(sql).ToList();
+			//					return list.Count;
+			//				}
+			//			};
 
 			Func<int> simpleAdoNetTop10 = () =>
 			{
@@ -248,9 +246,9 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 
 
 
-//			Func<int> complexEfDbContextCodeFirstTop10 = () =>
+//			Func<int> complexEf6CodeFirstTop10 = () =>
 //			{
-//				using (var ctx = new NorthwindEfDbContextCodeFirst())
+//				using (var ctx = new NorthwindEf6CodeFirst())
 //				{
 //					var list =
 //						(
@@ -268,9 +266,9 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 //				}
 //			};
 
-//			Func<int> complexEfDbContextCodeFirstTop500 = () =>
+//			Func<int> complexEf6CodeFirstTop500 = () =>
 //			{
-//				using (var ctx = new NorthwindEfDbContextCodeFirst())
+//				using (var ctx = new NorthwindEf6CodeFirst())
 //				{
 //					var list =
 //						(
@@ -288,9 +286,9 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 //				}
 //			};
 
-//			Func<int> complexEfDbContextCodeFirstRawTop10 = () =>
+//			Func<int> complexEf6CodeFirstRawTop10 = () =>
 //			{
-//				using (var ctx = new NorthwindEfDbContextCodeFirst())
+//				using (var ctx = new NorthwindEf6CodeFirst())
 //				{
 //					var sql = @"
 //SELECT TOP 10 OD.Quantity, OD.UnitPrice, OD.Discount, O.ShipCountry, S.Country
@@ -310,9 +308,9 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 //				}
 //			};
 
-//			Func<int> complexEfDbContextCodeFirstRawTop500 = () =>
+//			Func<int> complexEf6CodeFirstRawTop500 = () =>
 //			{
-//				using (var ctx = new NorthwindEfDbContextCodeFirst())
+//				using (var ctx = new NorthwindEf6CodeFirst())
 //				{
 //					var sql = @"
 //SELECT TOP 500 OD.Quantity, OD.UnitPrice, OD.Discount, O.ShipCountry, S.Country
@@ -555,9 +553,9 @@ ORDER BY OD.Discount DESC
 
 
 
-//			Func<int> simpleEfDbContextCodeFirstTop10And10 = () =>
+//			Func<int> simpleEf6CodeFirstTop10And10 = () =>
 //			{
-//				using (var ctx = new NorthwindEfDbContextCodeFirst())
+//				using (var ctx = new NorthwindEf6CodeFirst())
 //				{
 //					var list =
 //						(
@@ -575,9 +573,9 @@ ORDER BY OD.Discount DESC
 //				}
 //			};
 
-//			Func<int> simpleEfDbContextCodeFirstRawTop10And10 = () =>
+//			Func<int> simpleEf6CodeFirstRawTop10And10 = () =>
 //			{
-//				using (var ctx = new NorthwindEfDbContextCodeFirst())
+//				using (var ctx = new NorthwindEf6CodeFirst())
 //				{
 //					var sql = @"
 //SELECT TOP 10 O.OrderID, O.OrderDate, C.Country, C.CompanyName
@@ -731,10 +729,10 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 
 			var testsToRun = new List<Tuple<Func<int>, string>>
 			{
-				//new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstTop10, "simple, EfDbContextCodeFirst, take 10"),
-				//new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstTop500, "simple, EfDbContextCodeFirst, take 500"),
-				//new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstRawTop10, "simple, EfDbContextCodeFirst raw, take 10"),
-				//new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstRawTop500, "simple, EfDbContextCodeFirst raw, take 500"),
+				new Tuple<Func<int>, string>(simpleEf6CodeFirstTop10, "simple, Ef6CodeFirst, take 10"),
+				//new Tuple<Func<int>, string>(simpleEf6CodeFirstTop500, "simple, Ef6CodeFirst, take 500"),
+				//new Tuple<Func<int>, string>(simpleEf6CodeFirstRawTop10, "simple, Ef6CodeFirst raw, take 10"),
+				//new Tuple<Func<int>, string>(simpleEf6CodeFirstRawTop500, "simple, Ef6CodeFirst raw, take 500"),
 				new Tuple<Func<int>, string>(simpleAdoNetTop10, "simple, ADO.NET, take 10"),
 				//new Tuple<Func<int>, string>(simpleAdoNetTop500, "simple, ADO.NET, take 500"),
 				//new Tuple<Func<int>, string>(simpleLinq2DbTop10, "simple, linq2db, take 10"),
@@ -744,10 +742,10 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 				//new Tuple<Func<int>, string>(simpleEfCoreTop10, "simple, EfCore, take 10"),
 				//new Tuple<Func<int>, string>(simpleEfCoreTop500, "simple, EfCore, take 500"),
 
-				//new Tuple<Func<int>, string>(complexEfDbContextCodeFirstTop10, "complex, EfDbContextCodeFirst, take 10"),
-				//new Tuple<Func<int>, string>(complexEfDbContextCodeFirstTop500, "complex, EfDbContextCodeFirst, take 500"),
-				//new Tuple<Func<int>, string>(complexEfDbContextCodeFirstRawTop10, "complex, EfDbContextCodeFirst raw, take 10"),
-				//new Tuple<Func<int>, string>(complexEfDbContextCodeFirstRawTop500, "complex, EfDbContextCodeFirst raw, take 500"),
+				//new Tuple<Func<int>, string>(complexEf6CodeFirstTop10, "complex, Ef6CodeFirst, take 10"),
+				//new Tuple<Func<int>, string>(complexEf6CodeFirstTop500, "complex, Ef6CodeFirst, take 500"),
+				//new Tuple<Func<int>, string>(complexEf6CodeFirstRawTop10, "complex, Ef6CodeFirst raw, take 10"),
+				//new Tuple<Func<int>, string>(complexEf6CodeFirstRawTop500, "complex, Ef6CodeFirst raw, take 500"),
 				//new Tuple<Func<int>, string>(complexAdoNetTop10, "complex, ADO.NET, take 10"),
 				//new Tuple<Func<int>, string>(complexAdoNetTop500, "complex, ADO.NET, take 500"),
 				//new Tuple<Func<int>, string>(complexLinq2DbTop10, "complex, linq2db, take 10"),
@@ -757,8 +755,8 @@ JOIN Customers C ON O.CustomerID = C.CustomerID
 				//new Tuple<Func<int>, string>(complexEfCoreTop10, "complex, EfCore, take 10"),
 				//new Tuple<Func<int>, string>(complexEfCoreTop500, "complex, EfCore, take 500"),
 
-				//new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstTop10And10, "simple, EfDbContextCodeFirst, take 10+10"),
-				//new Tuple<Func<int>, string>(simpleEfDbContextCodeFirstRawTop10And10, "simple, EfDbContextCodeFirst raw, take 10+10"),
+				//new Tuple<Func<int>, string>(simpleEf6CodeFirstTop10And10, "simple, Ef6CodeFirst, take 10+10"),
+				//new Tuple<Func<int>, string>(simpleEf6CodeFirstRawTop10And10, "simple, Ef6CodeFirst raw, take 10+10"),
 				//new Tuple<Func<int>, string>(simpleAdoNetTop10And10, "simple, ADO.NET, take 10+10"),
 				//new Tuple<Func<int>, string>(simpleLinq2DbTop10And10, "simple, linq2db, take 10+10"),
 				//new Tuple<Func<int>, string>(simpleLinq2DbRawTop10And10, "simple, linq2db raw, take 10+10"),
