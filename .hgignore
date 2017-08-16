@@ -14,3 +14,5 @@ packages/Microsoft*
 packages/NETStandard*
 packages/Remotion*
 packages/System*
+.tools
+.vs

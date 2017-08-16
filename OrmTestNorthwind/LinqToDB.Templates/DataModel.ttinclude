@@ -41,6 +41,8 @@ bool SingularizeClassNames               = true;
 bool PluralizeDataContextPropertyNames   = true;
 bool SingularizeDataContextPropertyNames = false;
 
+bool NormalizeNames                      = true;
+
 LinqToDB.SchemaProvider.GetSchemaOptions GetSchemaOptions =
 	new LinqToDB.SchemaProvider.GetSchemaOptions();
 
@@ -59,7 +61,7 @@ void LoadServerMetadata(DataConnection dataConnection)
 		DatabaseName = db.Database;
 
 	if (DataContextName == null)
-		DataContextObject.Name = DataContextName = db.Database + "DB";
+		DataContextObject.Name = DataContextName = (ToValidName(db.Database) + "DB");
 
 	DataContextObject.Comment.Add("/ <summary>");
 	DataContextObject.Comment.Add("/ Database       : " + db.Database);
@@ -172,7 +174,7 @@ void LoadServerMetadata(DataConnection dataConnection)
 			{
 				Schema          = (p.IsDefaultSchema && !IncludeDefaultSchema) || string.IsNullOrEmpty(p.SchemaName)? null : p.SchemaName,
 				ProcedureName   = p.ProcedureName,
-				Name            = p.MemberName,
+				Name            = ToValidName(p.MemberName),
 				IsFunction      = p.IsFunction,
 				IsTableFunction = p.IsTableFunction,
 				IsDefaultSchema = p.IsDefaultSchema,
@@ -180,9 +182,9 @@ void LoadServerMetadata(DataConnection dataConnection)
 				ResultTable     = p.ResultTable == null ? null :
 					new Table
 					{
-						TypeName =
+						TypeName = ToValidName(
 							PluralizeClassNames   ? ToPlural  (p.ResultTable.TypeName) :
-							SingularizeClassNames ? ToSingular(p.ResultTable.TypeName) : p.ResultTable.TypeName,
+							SingularizeClassNames ? ToSingular(p.ResultTable.TypeName) : p.ResultTable.TypeName),
 						Columns  = ToDictionary(
 							p.ResultTable.Columns,
 							c => c.ColumnName,
@@ -345,18 +347,41 @@ void LoadMetadata(DataConnection dataConnection)
 			if (col.MemberName == t.TypeName)
 				col.MemberName += "_Column";
 		}
+
+	    var duplicates = t.Columns.Values.ToLookup(c => c.MemberName).Where(g => g.Count() > 1);
+	    foreach (var d in duplicates)
+	    {
+			var alreadyNamed = new HashSet<string>();
+	        foreach (var col in d)
+	        {
+	            col.MemberName = col.ColumnName;
+	            if (keyWords.Contains(col.MemberName))
+	                col.MemberName = "@" + col.MemberName;
+
+	            col.MemberName = ConvertToCompilable(col.MemberName, false);
+
+	            if (col.MemberName == t.TypeName)
+	                col.MemberName += "_Column";
+
+	            while (alreadyNamed.Contains(col.MemberName))
+	            {
+	                col.MemberName += "_";
+	            }
+	            alreadyNamed.Add(col.MemberName);
+	        }
+	    }
 	}
 
 	AfterLoadMetadata();
 }
 
-string ConvertToCompilable(string name)
+string ConvertToCompilable(string name, bool mayRemoveUnderscore = true)
 {
 	var query =
 		from c in name
 		select char.IsLetterOrDigit(c) || c == '@' ? c : '_';
 
-	return new string(query.ToArray());
+	return ToValidName(new string(query.ToArray()), mayRemoveUnderscore);
 }
 
 Table GetTable(string name)
@@ -633,6 +658,41 @@ public class Parameter
 	public string   ParameterType { get; set; }
 	public Type     SystemType    { get; set; }
 	public string   DataType      { get; set; }
+}
+
+int _counter = 0;
+string ToValidName(string name, bool mayRemoveUnderscore = true)
+{
+	if (NormalizeNames && mayRemoveUnderscore && name.Contains("_"))
+	{
+		name = SplitAndJoin(name, "", '_');
+	}	
+
+	if (name.Contains("."))
+	{
+		name = SplitAndJoin(name, "", '.');
+	}
+		
+	if (name.Length > 0 && char.IsDigit(name[0]))
+		name = "_" + name;
+
+	if (string.IsNullOrEmpty(name))
+		name = "_" + _counter++;
+
+	if (NormalizeNames)
+	{
+		name = char.ToUpper(name[0]) + name.Substring(1);
+	}
+
+	return name;
+}
+
+string SplitAndJoin(string value, string join, params char[] split)
+{
+	var ss = value.Split(split, StringSplitOptions.RemoveEmptyEntries)
+		.Select(s => char.ToUpper(s[0]) + s.Substring(1));
+
+	return string.Join(join, ss.ToArray());
 }
 
 #>

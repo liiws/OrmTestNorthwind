@@ -15,6 +15,7 @@ using LinqToDB;
 using LinqToDB.Common;
 using LinqToDB.Data;
 using LinqToDB.DataProvider.SqlServer;
+using LinqToDB.Extensions;
 using LinqToDB.Mapping;
 
 namespace DataModels
@@ -77,22 +78,31 @@ namespace DataModels
 			public int Rank;
 		}
 
+		private static MethodInfo _freeTextTableMethod1 = typeof(NorthwindDB).GetMethod("FreeTextTable", new Type[] { typeof(string), typeof(string) });
+
 		[FreeTextTableExpression]
 		public ITable<FreeTextKey<TKey>> FreeTextTable<TTable,TKey>(string field, string text)
 		{
 			return this.GetTable<FreeTextKey<TKey>>(
 				this,
-				((MethodInfo)(MethodBase.GetCurrentMethod())).MakeGenericMethod(typeof(TTable), typeof(TKey)),
+				_freeTextTableMethod1,
 				field,
 				text);
 		}
+
+		private static MethodInfo _freeTextTableMethod2 = 
+			typeof(NorthwindDB).GetMethods()
+				.Where(m => m.Name == "FreeTextTable" &&  m.IsGenericMethod && m.GetParameters().Length == 2)
+				.Where(m => m.GetParameters()[0].ParameterType.IsGenericTypeEx() && m.GetParameters()[0].ParameterType.GetGenericTypeDefinition() == typeof(Expression<>))
+				.Where(m => m.GetParameters()[1].ParameterType == typeof(string))
+				.Single();
 
 		[FreeTextTableExpression]
 		public ITable<FreeTextKey<TKey>> FreeTextTable<TTable,TKey>(Expression<Func<TTable,string>> fieldSelector, string text)
 		{
 			return this.GetTable<FreeTextKey<TKey>>(
 				this,
-				((MethodInfo)(MethodBase.GetCurrentMethod())).MakeGenericMethod(typeof(TTable), typeof(TKey)),
+				_freeTextTableMethod2,
 				fieldSelector,
 				text);
 		}
@@ -167,16 +177,16 @@ namespace DataModels
 		#region Associations
 
 		/// <summary>
-		/// FK_Orders_Customers_BackReference
-		/// </summary>
-		[Association(ThisKey="CustomerID", OtherKey="CustomerID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
-		public IEnumerable<Order> Orders { get; set; }
-
-		/// <summary>
 		/// FK_CustomerCustomerDemo_Customers_BackReference
 		/// </summary>
 		[Association(ThisKey="CustomerID", OtherKey="CustomerID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<CustomerCustomerDemo> CustomerCustomerDemoes { get; set; }
+
+		/// <summary>
+		/// FK_Orders_Customers_BackReference
+		/// </summary>
+		[Association(ThisKey="CustomerID", OtherKey="CustomerID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
+		public IEnumerable<Order> Orders { get; set; }
 
 		#endregion
 	}
@@ -208,7 +218,7 @@ namespace DataModels
 		/// FK_CustomerCustomerDemo
 		/// </summary>
 		[Association(ThisKey="CustomerTypeID", OtherKey="CustomerTypeID", CanBeNull=false, Relationship=Relationship.ManyToOne, KeyName="FK_CustomerCustomerDemo", BackReferenceName="CustomerCustomerDemoes")]
-		public CustomerDemographic FK_CustomerCustomerDemo { get; set; }
+		public CustomerDemographic CustomerDemographic { get; set; }
 
 		#endregion
 	}
@@ -255,28 +265,28 @@ namespace DataModels
 		#region Associations
 
 		/// <summary>
-		/// FK_Employees_Employees
-		/// </summary>
-		[Association(ThisKey="ReportsTo", OtherKey="EmployeeID", CanBeNull=true, Relationship=Relationship.ManyToOne, KeyName="FK_Employees_Employees", BackReferenceName="FK_Employees_Employees_BackReferences")]
-		public Employee FK_Employees_Employee { get; set; }
-
-		/// <summary>
-		/// FK_Orders_Employees_BackReference
-		/// </summary>
-		[Association(ThisKey="EmployeeID", OtherKey="EmployeeID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
-		public IEnumerable<Order> Orders { get; set; }
-
-		/// <summary>
 		/// FK_EmployeeTerritories_Employees_BackReference
 		/// </summary>
 		[Association(ThisKey="EmployeeID", OtherKey="EmployeeID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<EmployeeTerritory> EmployeeTerritories { get; set; }
 
 		/// <summary>
+		/// FK_Employees_Employees
+		/// </summary>
+		[Association(ThisKey="ReportsTo", OtherKey="EmployeeID", CanBeNull=true, Relationship=Relationship.ManyToOne, KeyName="FK_Employees_Employees", BackReferenceName="FK_Employees_Employees_BackReferences")]
+		public Employee FK_Employees_Employee { get; set; }
+
+		/// <summary>
 		/// FK_Employees_Employees_BackReference
 		/// </summary>
 		[Association(ThisKey="EmployeeID", OtherKey="ReportsTo", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<Employee> FK_Employees_Employees_BackReferences { get; set; }
+
+		/// <summary>
+		/// FK_Orders_Employees_BackReference
+		/// </summary>
+		[Association(ThisKey="EmployeeID", OtherKey="EmployeeID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
+		public IEnumerable<Order> Orders { get; set; }
 
 		#endregion
 	}
@@ -368,16 +378,16 @@ namespace DataModels
 		public Employee Employee { get; set; }
 
 		/// <summary>
-		/// FK_Orders_Shippers
-		/// </summary>
-		[Association(ThisKey="ShipVia", OtherKey="ShipperID", CanBeNull=true, Relationship=Relationship.ManyToOne, KeyName="FK_Orders_Shippers", BackReferenceName="Orders")]
-		public Shipper Shipper { get; set; }
-
-		/// <summary>
 		/// FK_Order_Details_Orders_BackReference
 		/// </summary>
 		[Association(ThisKey="OrderID", OtherKey="OrderID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<OrderDetail> OrderDetails { get; set; }
+
+		/// <summary>
+		/// FK_Orders_Shippers
+		/// </summary>
+		[Association(ThisKey="ShipVia", OtherKey="ShipperID", CanBeNull=true, Relationship=Relationship.ManyToOne, KeyName="FK_Orders_Shippers", BackReferenceName="Orders")]
+		public Shipper Shipper { get; set; }
 
 		#endregion
 	}
@@ -470,12 +480,6 @@ namespace DataModels
 		#region Associations
 
 		/// <summary>
-		/// FK_Products_Suppliers
-		/// </summary>
-		[Association(ThisKey="SupplierID", OtherKey="SupplierID", CanBeNull=true, Relationship=Relationship.ManyToOne, KeyName="FK_Products_Suppliers", BackReferenceName="Products")]
-		public Supplier Supplier { get; set; }
-
-		/// <summary>
 		/// FK_Products_Categories
 		/// </summary>
 		[Association(ThisKey="CategoryID", OtherKey="CategoryID", CanBeNull=true, Relationship=Relationship.ManyToOne, KeyName="FK_Products_Categories", BackReferenceName="Products")]
@@ -486,6 +490,12 @@ namespace DataModels
 		/// </summary>
 		[Association(ThisKey="ProductID", OtherKey="ProductID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<OrderDetail> OrderDetails { get; set; }
+
+		/// <summary>
+		/// FK_Products_Suppliers
+		/// </summary>
+		[Association(ThisKey="SupplierID", OtherKey="SupplierID", CanBeNull=true, Relationship=Relationship.ManyToOne, KeyName="FK_Products_Suppliers", BackReferenceName="Products")]
+		public Supplier Supplier { get; set; }
 
 		#endregion
 	}
@@ -630,16 +640,16 @@ namespace DataModels
 		#region Associations
 
 		/// <summary>
-		/// FK_Territories_Region
-		/// </summary>
-		[Association(ThisKey="RegionID", OtherKey="RegionID", CanBeNull=false, Relationship=Relationship.ManyToOne, KeyName="FK_Territories_Region", BackReferenceName="Territories")]
-		public Region Region { get; set; }
-
-		/// <summary>
 		/// FK_EmployeeTerritories_Territories_BackReference
 		/// </summary>
 		[Association(ThisKey="TerritoryID", OtherKey="TerritoryID", CanBeNull=true, Relationship=Relationship.OneToMany, IsBackReference=true)]
 		public IEnumerable<EmployeeTerritory> EmployeeTerritories { get; set; }
+
+		/// <summary>
+		/// FK_Territories_Region
+		/// </summary>
+		[Association(ThisKey="RegionID", OtherKey="RegionID", CanBeNull=false, Relationship=Relationship.ManyToOne, KeyName="FK_Territories_Region", BackReferenceName="Territories")]
+		public Region Region { get; set; }
 
 		#endregion
 	}
@@ -756,22 +766,9 @@ namespace DataModels
 
 		#endregion
 
-		#region sp_alterdiagram
+		#region SpCreatediagram
 
-		public static int sp_alterdiagram(this DataConnection dataConnection, string @diagramname, int? @owner_id, int? @version, byte[] @definition)
-		{
-			return dataConnection.ExecuteProc("[dbo].[sp_alterdiagram]",
-				new DataParameter("@diagramname", @diagramname, DataType.NVarChar),
-				new DataParameter("@owner_id",    @owner_id,    DataType.Int32),
-				new DataParameter("@version",     @version,     DataType.Int32),
-				new DataParameter("@definition",  @definition,  DataType.VarBinary));
-		}
-
-		#endregion
-
-		#region sp_creatediagram
-
-		public static int sp_creatediagram(this DataConnection dataConnection, string @diagramname, int? @owner_id, int? @version, byte[] @definition)
+		public static int SpCreatediagram(this DataConnection dataConnection, string @diagramname, int? @owner_id, int? @version, byte[] @definition)
 		{
 			return dataConnection.ExecuteProc("[dbo].[sp_creatediagram]",
 				new DataParameter("@diagramname", @diagramname, DataType.NVarChar),
@@ -782,9 +779,9 @@ namespace DataModels
 
 		#endregion
 
-		#region sp_dropdiagram
+		#region SpDropdiagram
 
-		public static int sp_dropdiagram(this DataConnection dataConnection, string @diagramname, int? @owner_id)
+		public static int SpDropdiagram(this DataConnection dataConnection, string @diagramname, int? @owner_id)
 		{
 			return dataConnection.ExecuteProc("[dbo].[sp_dropdiagram]",
 				new DataParameter("@diagramname", @diagramname, DataType.NVarChar),
@@ -793,33 +790,16 @@ namespace DataModels
 
 		#endregion
 
-		#region sp_helpdiagramdefinition
+		#region SpHelpdiagrams
 
-		public static IEnumerable<sp_helpdiagramdefinitionResult> sp_helpdiagramdefinition(this DataConnection dataConnection, string @diagramname, int? @owner_id)
+		public static IEnumerable<SpHelpdiagramsResult> SpHelpdiagrams(this DataConnection dataConnection, string @diagramname, int? @owner_id)
 		{
-			return dataConnection.QueryProc<sp_helpdiagramdefinitionResult>("[dbo].[sp_helpdiagramdefinition]",
+			return dataConnection.QueryProc<SpHelpdiagramsResult>("[dbo].[sp_helpdiagrams]",
 				new DataParameter("@diagramname", @diagramname, DataType.NVarChar),
 				new DataParameter("@owner_id",    @owner_id,    DataType.Int32));
 		}
 
-		public partial class sp_helpdiagramdefinitionResult
-		{
-			public int?   version    { get; set; }
-			public byte[] definition { get; set; }
-		}
-
-		#endregion
-
-		#region sp_helpdiagrams
-
-		public static IEnumerable<sp_helpdiagramsResult> sp_helpdiagrams(this DataConnection dataConnection, string @diagramname, int? @owner_id)
-		{
-			return dataConnection.QueryProc<sp_helpdiagramsResult>("[dbo].[sp_helpdiagrams]",
-				new DataParameter("@diagramname", @diagramname, DataType.NVarChar),
-				new DataParameter("@owner_id",    @owner_id,    DataType.Int32));
-		}
-
-		public partial class sp_helpdiagramsResult
+		public partial class SpHelpdiagramsResult
 		{
 			public string Database { get; set; }
 			public string Name     { get; set; }
@@ -830,14 +810,11 @@ namespace DataModels
 
 		#endregion
 
-		#region sp_renamediagram
+		#region SpUpgraddiagrams
 
-		public static int sp_renamediagram(this DataConnection dataConnection, string @diagramname, int? @owner_id, string @new_diagramname)
+		public static int SpUpgraddiagrams(this DataConnection dataConnection)
 		{
-			return dataConnection.ExecuteProc("[dbo].[sp_renamediagram]",
-				new DataParameter("@diagramname",     @diagramname,     DataType.NVarChar),
-				new DataParameter("@owner_id",        @owner_id,        DataType.Int32),
-				new DataParameter("@new_diagramname", @new_diagramname, DataType.NVarChar));
+			return dataConnection.ExecuteProc("[dbo].[sp_upgraddiagrams]");
 		}
 
 		#endregion
@@ -860,10 +837,10 @@ namespace DataModels
 
 	public static partial class SqlFunctions
 	{
-		#region fn_diagramobjects
+		#region FnDiagramobjects
 
 		[Sql.Function(Name="dbo.fn_diagramobjects", ServerSideOnly=true)]
-		public static int? fn_diagramobjects()
+		public static int? FnDiagramobjects()
 		{
 			throw new InvalidOperationException();
 		}
