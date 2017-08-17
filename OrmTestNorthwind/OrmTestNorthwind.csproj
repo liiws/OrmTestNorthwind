@@ -143,6 +143,7 @@
     <Compile Include="EfCoreModels\Customers.cs" />
     <Compile Include="EfCoreModels\Employees.cs" />
     <Compile Include="EfCoreModels\EmployeeTerritories.cs" />
+    <Compile Include="EfCoreModels\NorthwindContext.Custom.cs" />
     <Compile Include="EfCoreModels\NorthwindContext.cs" />
     <Compile Include="EfCoreModels\OrderDetails.cs" />
     <Compile Include="EfCoreModels\Orders.cs" />
