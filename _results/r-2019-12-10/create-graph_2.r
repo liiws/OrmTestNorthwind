@@ -20,7 +20,7 @@ CreateGraph2 <- function(title, fileName, inputData)
     file = paste0(dirname(sys.frame(1)$ofile), "/", fileName),
     width = width, height = height, type = "cairo")
 
-  barplot(matrix(c("")), main=title, space=0, xlim=c(0, data_count*3-1), ylim=c(0,plot_top), las=1)
+  barplot(matrix(c("")), main=title, ylab="Time, ms", space=0, xlim=c(0, data_count*3-1), ylim=c(0,plot_top), las=1)
   for (i in seq(1, data_count))
   {
     dataDotnet <- matrix(as.numeric(inputData[[i]][2:3]), ncol=1)
